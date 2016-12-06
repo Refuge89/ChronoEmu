@@ -29,7 +29,7 @@
 OpcodeHandler WorldPacketHandlers[NUM_MSG_TYPES];
 
 WorldSession::WorldSession(uint32 id, string Name, WorldSocket *sock) : _player(0), _socket(sock), _accountId(id), _accountName(Name),
-_logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), instanceId(0)
+_logoutTime(0), permissions(nullptr), permissioncount(0), _loggingOut(false), instanceId(0)
 {
 	memset(movement_packet, 0, sizeof(movement_packet));
 	m_currMsTime = getMSTime();
@@ -40,14 +40,14 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	_updatecount = 0;
 	m_moveDelayTime=0;
 	m_clientTimeDelay =0;
-	m_loggingInPlayer=NULL;
+	m_loggingInPlayer=nullptr;
 	language=0;
 	m_muted = 0;
 	_side = -1;
 	movement_info.FallTime = 0;
 
 	for(uint32 x=0;x<8;x++)
-		sAccountData[x].data=NULL;	
+		sAccountData[x].data=nullptr;	
 }
 
 WorldSession::~WorldSession()
@@ -83,7 +83,7 @@ WorldSession::~WorldSession()
 #endif
 
 	if(m_loggingInPlayer)
-		m_loggingInPlayer->SetSession(NULL);
+		m_loggingInPlayer->SetSession(nullptr);
 
 	deleteMutex.Release();
 }
@@ -191,7 +191,7 @@ int WorldSession::Update(uint32 InstanceID)
 			return 0;
 		}
 
-		if( _socket == NULL )
+		if( _socket == nullptr )
 		{
 			bDeleted = true;
 			LogoutPlayer(true);
@@ -212,10 +212,10 @@ int WorldSession::Update(uint32 InstanceID)
 		}
 
 		// ping timeout!
-		if( _socket != NULL )
+		if( _socket != nullptr )
 		{
 			Disconnect();
-			_socket = NULL;
+			_socket = nullptr;
 		}
 
 		m_lastPing = (uint32)UNIXTIME;		// Prevent calling this code over and over.
@@ -236,7 +236,7 @@ void WorldSession::LogoutPlayer(bool Save)
 
 	_loggingOut = true;
 
-	if( _player != NULL )
+	if( _player != nullptr )
 	{
 		sHookInterface.OnLogout( pPlayer );
 		if( _player->DuelingWith )
@@ -245,7 +245,7 @@ void WorldSession::LogoutPlayer(bool Save)
 		if( _player->m_currentLoot && _player->IsInWorld() )
 		{
 			Object* obj = _player->GetMapMgr()->_GetObject( _player->m_currentLoot );
-			if( obj != NULL )
+			if( obj != nullptr )
 			{
 				switch( obj->GetTypeId() )
 				{
@@ -262,11 +262,11 @@ void WorldSession::LogoutPlayer(bool Save)
 		// part channels
 		_player->CleanupChannels();
 
-		if( _player->m_CurrentTransporter != NULL )
+		if( _player->m_CurrentTransporter != nullptr )
 			_player->m_CurrentTransporter->RemovePlayer( _player );
 
 		// cancel current spell
-		if( _player->m_currentSpell != NULL )
+		if( _player->m_currentSpell != nullptr )
 			_player->m_currentSpell->cancel();
 
 		_player->Social_TellFriendsOffline();
@@ -289,14 +289,14 @@ void WorldSession::LogoutPlayer(bool Save)
 			BattlegroundManager.RemovePlayerFromQueues( _player );
 
 		//Duel Cancel on Leave
-		if( _player->DuelingWith != NULL )
+		if( _player->DuelingWith != nullptr )
 			_player->EndDuel( DUEL_WINNER_RETREAT );
 
 		//Issue a message telling all guild members that this player signed off
 		if( _player->IsInGuild() )
 		{
 			Guild* pGuild = _player->m_playerInfo->guild;
-			if( pGuild != NULL )
+			if( pGuild != nullptr )
 				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName() );
 		}
 
@@ -309,7 +309,7 @@ void WorldSession::LogoutPlayer(bool Save)
 		objmgr.RemovePlayer( _player );		
 		_player->ok_to_remove = true;
 
-		if( _player->GetSummon() != NULL )
+		if( _player->GetSummon() != nullptr )
 			_player->GetSummon()->Remove( false, true, false );
 
 		//_player->SaveAuras();
@@ -321,9 +321,9 @@ void WorldSession::LogoutPlayer(bool Save)
 		if( _player->IsInWorld() )
 			_player->RemoveFromWorld();
 		
-		_player->m_playerInfo->m_loggedInPlayer = NULL;
+		_player->m_playerInfo->m_loggedInPlayer = nullptr;
 
-		if( _player->m_playerInfo->m_Group != NULL )
+		if( _player->m_playerInfo->m_Group != nullptr )
 			_player->m_playerInfo->m_Group->Update();
 	  
 		// Remove the "player locked" flag, to allow movement on next login
@@ -363,8 +363,8 @@ void WorldSession::LogoutPlayer(bool Save)
 		}
 
 		delete _player;
-		_player = NULL;
-		OutPacket(SMSG_LOGOUT_COMPLETE, 0, NULL);
+		_player = nullptr;
+		OutPacket(SMSG_LOGOUT_COMPLETE, 0, nullptr);
 		sLog.outDebug( "SESSION: Sent SMSG_LOGOUT_COMPLETE Message" );
 	}
 	_loggingOut = false;

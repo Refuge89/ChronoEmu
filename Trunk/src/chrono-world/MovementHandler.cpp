@@ -53,14 +53,14 @@ CHRONO_INLINE uint32 mTimeStamp()
 uint32 TimeStamp()
 {
 	struct timeval tp;
-	gettimeofday(&tp, NULL);
+	gettimeofday(&tp, nullptr);
 	return (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
 }
 
 CHRONO_INLINE uint32 mTimeStamp()
 {
 	struct timeval tp;
-	gettimeofday(&tp, NULL);
+	gettimeofday(&tp, nullptr);
 	return (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
 }
 
@@ -126,7 +126,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 			GetPlayer()->SetMovement(MOVE_UNROOT,5);
 		_player->ResetHeartbeatCoords();
 
-		if(GetPlayer()->GetSummon() != NULL)		// move pet too
+		if(GetPlayer()->GetSummon() != nullptr)		// move pet too
 			GetPlayer()->GetSummon()->SetPosition((GetPlayer()->GetPositionX() + 2), (GetPlayer()->GetPositionY() + 2), GetPlayer()->GetPositionZ(), float(M_PI));
 		m_isFalling = false;	
 		if(_player->m_sentTeleportPosition.x != 999999.0f)
@@ -528,7 +528,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			if(_player->m_CurrentTransporter)
 			{
 				_player->m_CurrentTransporter->RemovePlayer(_player);
-				_player->m_CurrentTransporter = NULL;
+				_player->m_CurrentTransporter = nullptr;
 			}
 
 			_player->m_TransporterGUID = 0;
@@ -644,7 +644,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
 	recv_data >> time_dif;
 
 	// ignore updates for not us
-	if( _player == NULL || guid != _player->GetGUID() )
+	if( _player == nullptr || guid != _player->GetGUID() )
 		return;
 
 	// send to other players
@@ -733,7 +733,7 @@ void WorldSession::HandleTeleportToUnitOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if( (target = _player->GetMapMgr()->GetUnit(_player->GetSelection())) == NULL )
+	if( (target = _player->GetMapMgr()->GetUnit(_player->GetSelection())) == nullptr )
 		return;
 
 	_player->SafeTeleport(_player->GetMapId(), _player->GetInstanceID(), target->GetPosition());

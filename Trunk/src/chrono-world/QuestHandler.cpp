@@ -28,7 +28,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
 
 	uint64 guid;
 	WorldPacket data(SMSG_QUESTGIVER_STATUS, 12);
-    Object *qst_giver = NULL;
+    Object *qst_giver = nullptr;
 
 	recv_data >> guid;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
@@ -118,7 +118,7 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 	recv_data >> guid;
 	recv_data >> quest_id;
 
-	Object *qst_giver = NULL;
+	Object *qst_giver = nullptr;
 
 	bool bValid = false;
 	Quest* qst = QuestStorage.LookupEntry(quest_id);
@@ -218,8 +218,8 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	bool bValid = false;
 	bool hasquest = true;
 	bool bSkipLevelCheck = false;
-	Quest *qst = NULL;
-	Object *qst_giver = NULL;
+	Quest *qst = nullptr;
+	Object *qst_giver = nullptr;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
 
 	if(guidtype==HIGHGUID_TYPE_UNIT)
@@ -274,7 +274,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if( !bValid || qst == NULL )
+	if( !bValid || qst == nullptr )
 	{
 		sLog.outDebug("WORLD: Creature is not a questgiver.");
 		return;
@@ -283,7 +283,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	if( _player->GetQuestLogForEntry( qst->id ) )
 		return;
 
-	if( qst_giver->GetTypeId() == TYPEID_UNIT && TO_CREATURE( qst_giver )->m_escorter != NULL )
+	if( qst_giver->GetTypeId() == TYPEID_UNIT && TO_CREATURE( qst_giver )->m_escorter != nullptr )
 	{
 		SystemMessage("You cannot accept this quest at this time.");
 		return;
@@ -318,9 +318,9 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	{
 		uint32 slots_required = qst->count_receiveitems;
 
-		if(GetPlayer()->GetItemInterface()->CalculateFreeSlots(NULL) < slots_required)
+		if(GetPlayer()->GetItemInterface()->CalculateFreeSlots(nullptr) < slots_required)
 		{
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_BAG_FULL);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, INV_ERR_BAG_FULL);
 			sQuestMgr.SendQuestFailed(FAILED_REASON_INV_FULL, qst, GetPlayer());
 			return;
 		}
@@ -366,7 +366,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	{
 		//Start Quest Timer Event Here
 		//sEventMgr.AddEvent(GetPlayer(), &Player::EventTimedQuestExpire, qst, qle, static_cast<uint32>(log_slot), EVENT_TIMED_QUEST_EXPIRE, qst->time * 1000, 1);
-		//uint32 qtime = static_cast<uint32>(time(NULL) + qst->time);
+		//uint32 qtime = static_cast<uint32>(time(nullptr) + qst->time);
 		//GetPlayer()->SetUInt32Value(log_slot+2, qtime);
 		//GetPlayer()->SetUInt32Value(PLAYER_QUEST_LOG_1_01 + (log_slot * 3), qtime);
 		//GetPlayer()->timed_quest_slot = log_slot;
@@ -385,7 +385,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleQuestgiverCancelOpcode(WorldPacket& recvPacket)
 {
-    OutPacket(SMSG_GOSSIP_COMPLETE, 0, NULL);
+    OutPacket(SMSG_GOSSIP_COMPLETE, 0, nullptr);
 
 	sLog.outDebug("WORLD: Sent SMSG_GOSSIP_COMPLETE");
 }
@@ -464,8 +464,8 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 	recv_data >> quest_id;
 
 	bool bValid = false;
-	Quest *qst = NULL;
-	Object *qst_giver = NULL;
+	Quest *qst = nullptr;
+	Object *qst_giver = nullptr;
 	uint32 status = 0;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
 
@@ -520,7 +520,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 		return;
 	}
 
-	if (!bValid || qst == NULL)
+	if (!bValid || qst == nullptr)
 	{
 		sLog.outDebug("WORLD: Creature is not a questgiver.");
 		return;
@@ -550,8 +550,8 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 	recvPacket >> quest_id;
 
 	bool bValid = false;
-	Quest *qst = NULL;
-	Object *qst_giver = NULL;
+	Quest *qst = nullptr;
+	Object *qst_giver = nullptr;
 	uint32 status = 0;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
 
@@ -603,7 +603,7 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 		return;
 	}
 
-	if (!bValid || qst == NULL)
+	if (!bValid || qst == nullptr)
 	{
 		sLog.outDebug("WORLD: Creature is not a questgiver.");
 		return;
@@ -646,8 +646,8 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)
 		return;
 
 	bool bValid = false;
-	Quest *qst = NULL;
-	Object *qst_giver = NULL;
+	Quest *qst = nullptr;
+	Object *qst_giver = nullptr;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
 
 	if(guidtype==HIGHGUID_TYPE_UNIT)
@@ -680,7 +680,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)
 		return;
 	}
 
-	if (!bValid || qst == NULL)
+	if (!bValid || qst == nullptr)
 	{
 		sLog.outDebug("WORLD: Creature is not a questgiver.");
 		return;

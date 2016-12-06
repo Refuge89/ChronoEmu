@@ -870,7 +870,7 @@ public:
 
 	//! Remove all auras
 	void RemoveAllAuras();
-	bool RemoveAllAuras(uint32 spellId, uint64 guid, Aura* ignore = NULL); //remove stacked auras but only if they come from the same caster. Shaman purge If GUID = 0 then removes all auras with this spellid
+	bool RemoveAllAuras(uint32 spellId, uint64 guid, Aura* ignore = nullptr); //remove stacked auras but only if they come from the same caster. Shaman purge If GUID = 0 then removes all auras with this spellid
     void RemoveAllAuraType(uint32 auratype);//ex:to remove morph spells
 	bool RemoveAllAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAllPosAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
@@ -1188,8 +1188,8 @@ public:
 	bool HasNegativeAura(uint32 spell_id); //just to reduce search range in some cases
 	bool IsPoisoned();
 
-	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Object *caster=NULL);
-	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Aura* aur, Object *caster=NULL);
+	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Object *caster=nullptr);
+	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Aura* aur, Object *caster=nullptr);
 
 	uint16 m_diminishCount[23];
 	uint8  m_diminishAuraCount[23];
@@ -1271,7 +1271,7 @@ public:
 	}
 	bool HasDummyAura( uint32 namehash )
 	{
-		return m_DummyAuras[namehash] != NULL;
+		return m_DummyAuras[namehash] != nullptr;
 	}
 	SpellEntry* GetDummyAura( uint32 namehash )
 	{
@@ -1279,7 +1279,7 @@ public:
 	}
 	void RemoveDummyAura( uint32 namehash )//we removes only this shit, not aura
 	{
-		m_DummyAuras[namehash] = NULL;
+		m_DummyAuras[namehash] = nullptr;
 	}
 	
 	void Dismount();	

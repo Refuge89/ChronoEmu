@@ -245,7 +245,7 @@ bool Rehash()
 		m_allowedModIps.push_back(tmp);
 	}
 
-	if( InformationCore::getSingletonPtr() != NULL )
+	if( InformationCore::getSingletonPtr() != nullptr )
 		sInfoCore.CheckServers();
 
 	m_allowedIpLock.Release();
@@ -256,7 +256,7 @@ bool Rehash()
 
 void LogonServer::Run(int argc, char ** argv)
 {
-	UNIXTIME = time(NULL);
+	UNIXTIME = time(nullptr);
 	g_localTime = *localtime(&UNIXTIME);
 #ifdef WIN32
 	char * config_file = "chrono-logonserver.conf";
@@ -274,12 +274,12 @@ void LogonServer::Run(int argc, char ** argv)
 		{ "screenloglevel",		chrono_required_argument,		&screen_log_level,		1		},
 		{ "fileloglevel",		chrono_required_argument,		&file_log_level,		1		},
 		{ "version",			chrono_no_argument,				&do_version,			1		},
-		{ "conf",				chrono_required_argument,		NULL,					'c'		},
+		{ "conf",				chrono_required_argument,		nullptr,					'c'		},
 		{ 0, 0, 0, 0 }
 	};
 
 	char c;
-	while ((c = chrono_getopt_long_only(argc, argv, ":f:", longopts, NULL)) != -1)
+	while ((c = chrono_getopt_long_only(argc, argv, ":f:", longopts, nullptr)) != -1)
 	{
 		switch (c)
 		{
@@ -437,7 +437,7 @@ void LogonServer::Run(int argc, char ** argv)
 		if(!(loop_counter%10))
 		{
 			oldtime = UNIXTIME;
-			UNIXTIME = time(NULL);
+			UNIXTIME = time(nullptr);
 			if( UNIXTIME != oldtime )
 			{
 				g_localTime = *localtime(&UNIXTIME);

@@ -1038,10 +1038,10 @@ public:
     /************************************************************************/
 	void                SetInviter(uint32 pInviter) { m_GroupInviter = pInviter; }
 	CHRONO_INLINE uint32       GetInviter() { return m_GroupInviter; }
-	CHRONO_INLINE bool         InGroup() { return (m_playerInfo->m_Group != NULL && !m_GroupInviter); }
+	CHRONO_INLINE bool         InGroup() { return (m_playerInfo->m_Group != nullptr && !m_GroupInviter); }
 	bool                IsGroupLeader()
 	{
-		if(m_playerInfo->m_Group != NULL)
+		if(m_playerInfo->m_Group != nullptr)
 		{
 			if(m_playerInfo->m_Group->GetLeader() == m_playerInfo)
 				return true;
@@ -1049,8 +1049,8 @@ public:
 		return false;
 	}
 	CHRONO_INLINE int          HasBeenInvited() { return m_GroupInviter != 0; }
-	CHRONO_INLINE Group*       GetGroup() { return m_playerInfo ? m_playerInfo->m_Group : NULL; }
-	CHRONO_INLINE uint32	GetGroupID() { return m_playerInfo != NULL ? m_playerInfo->m_Group != NULL ? m_playerInfo->m_Group->GetID(): NULL: NULL; }
+	CHRONO_INLINE Group*       GetGroup() { return m_playerInfo ? m_playerInfo->m_Group : nullptr; }
+	CHRONO_INLINE uint32	GetGroupID() { return m_playerInfo != nullptr ? m_playerInfo->m_Group != nullptr ? m_playerInfo->m_Group->GetID(): 0: 0; }
 	CHRONO_INLINE int8		   GetSubGroup() { return m_playerInfo->subGroup; }
     bool                IsGroupMember(Player *plyr);
 	CHRONO_INLINE bool         IsBanned()
@@ -1120,7 +1120,7 @@ public:
 		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.find(idx);
 		if(itr != m_Pets.end()) return itr->second;
 		else
-			return NULL;
+			return nullptr;
 	}
 	void						SpawnPet(uint32 pet_number);
 	void						DespawnPet();
@@ -1173,8 +1173,8 @@ public:
 	void SetBindPoint(float x, float y, float z, uint32 m, uint32 v) { m_bind_pos_x = x; m_bind_pos_y = y; m_bind_pos_z = z; m_bind_mapid = m; m_bind_zoneid = v;}
 	void SendDelayedPacket(WorldPacket *data, bool bDeleteOnSend)
 	{
-		if(data == NULL) return;
-		if(GetSession() != NULL) GetSession()->SendPacket(data);
+		if(data == nullptr) return;
+		if(GetSession() != nullptr) GetSession()->SendPacket(data);
 		if(bDeleteOnSend) delete data;
 	}
 	float offhand_dmg_mod;

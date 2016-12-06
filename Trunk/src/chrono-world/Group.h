@@ -142,10 +142,10 @@ public:
 	// Transferring data to clients
 	void Update();
 
-	CHRONO_INLINE void SendPacketToAll(WorldPacket *packet) { SendPacketToAllButOne(packet, NULL); }
+	CHRONO_INLINE void SendPacketToAll(WorldPacket *packet) { SendPacketToAllButOne(packet, nullptr); }
 	void SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget);
 
-	CHRONO_INLINE void OutPacketToAll(uint16 op, uint16 len, const void* data) { OutPacketToAllButOne(op, len, data, NULL); }
+	CHRONO_INLINE void OutPacketToAll(uint16 op, uint16 len, const void* data) { OutPacketToAllButOne(op, len, data, nullptr); }
 	void OutPacketToAllButOne(uint16 op, uint16 len, const void* data, Player *pSkipTarget);
 
 	void SendNullUpdate(Player *pPlayer);

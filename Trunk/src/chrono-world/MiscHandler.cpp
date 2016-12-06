@@ -39,12 +39,12 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	SlotResult slotresult;
 
 	Item *add;
-	Loot *pLoot = NULL;
+	Loot *pLoot = nullptr;
 
 	if(_player->isCasting())
 		_player->InterruptSpell();
-	GameObject * pGO = NULL;
-	Creature * pCreature = NULL;
+	GameObject * pGO = nullptr;
+	Creature * pCreature = nullptr;
 
 	uint32 guidtype = GET_TYPE_FROM_GUID(_player->GetLootGUID());
 	if(guidtype == HIGHGUID_TYPE_UNIT)
@@ -82,14 +82,14 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	}
 
 	amt = pLoot->items.at(lootSlot).iItemsCount;
-	if( pLoot->items.at(lootSlot).roll != NULL )
+	if( pLoot->items.at(lootSlot).roll != nullptr )
 		return;
 
 	if (!pLoot->items.at(lootSlot).ffa_loot)
 	{
 		if (!amt)//Test for party loot
 		{  
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr,INV_ERR_ALREADY_LOOTED);
 			return;
 		}
 	}
@@ -100,7 +100,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 
 		if (pLoot->items.at(lootSlot).has_looted.end() != itr)
 		{
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr,INV_ERR_ALREADY_LOOTED);
 			return;
 		}
 	}
@@ -110,7 +110,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 
 	if((error = _player->GetItemInterface()->CanReceiveItem(it, 1)))
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
+		_player->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, error);
 		return;
 	}
 
@@ -120,7 +120,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		slotresult = GetPlayer()->GetItemInterface()->FindFreeInventorySlot(it);
 		if(!slotresult.Result)
 		{
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, INV_ERR_INVENTORY_FULL);
 			return;
 		}
 	
@@ -128,7 +128,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		Item *item = objmgr.CreateItem( itemid, GetPlayer());
 	   
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
-		if(pLoot->items.at(lootSlot).iRandomProperty!=NULL)
+		if(pLoot->items.at(lootSlot).iRandomProperty!=nullptr)
 		{
 			item->SetRandomProperty(pLoot->items.at(lootSlot).iRandomProperty->ID);
 			item->ApplyRandomProperties(false);
@@ -203,7 +203,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 {
 	CHECK_INWORLD_RETURN
-	Loot * pLoot = NULL;
+	Loot * pLoot = nullptr;
 	uint64 lootguid=GetPlayer()->GetLootGUID();
 	if(!lootguid)
 		return;   // duno why this happens
@@ -393,7 +393,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	if( GET_TYPE_FROM_GUID( guid ) == HIGHGUID_TYPE_UNIT )
 	{
 		Creature* pCreature = _player->GetMapMgr()->GetCreature( GET_LOWGUID_PART(guid) );
-		if( pCreature == NULL )
+		if( pCreature == nullptr )
 			return;
 		// remove from looter set
 		pCreature->loot.looters.erase(_player->GetLowGUID());
@@ -422,7 +422,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	else if( GET_TYPE_FROM_GUID( guid ) == HIGHGUID_TYPE_GAMEOBJECT )
 	{	   
 		GameObject* pGO = _player->GetMapMgr()->GetGameObject( (uint32)guid );
-		if( pGO == NULL )
+		if( pGO == nullptr )
 			return;
 
         switch( pGO->GetUInt32Value( GAMEOBJECT_TYPE_ID ) )
@@ -759,7 +759,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 			return;
 		}
 
-		if(pPlayer->DuelingWith != NULL || pPlayer->CombatStatus.IsInCombat())
+		if(pPlayer->DuelingWith != nullptr || pPlayer->CombatStatus.IsInCombat())
 		{
 			//can't quit still dueling or attacking
 			data << uint32(0xC); //Filler
@@ -918,7 +918,7 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 	guid = _player->GetLowGUID();;
 	Corpse* pCorpse = _player->getMyCorpse();
 
-	if( pCorpse == NULL )
+	if( pCorpse == nullptr )
 		return;
 
 	// Check that we're reviving from a corpse, and that corpse is associated with us.
@@ -941,7 +941,7 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 
 	//this is removed because there is no known visual way to do it in 1.12.1 -BT
     // Check death clock before resurrect they must wait for release to complete
-/*  if( pCorpse->GetDeathClock() + CORPSE_RECLAIM_TIME > time( NULL ) )
+/*  if( pCorpse->GetDeathClock() + CORPSE_RECLAIM_TIME > time( nullptr ) )
 	{
 		WorldPacket data( SMSG_RESURRECT_FAILED, 4 );
 		data << uint32(1);
@@ -1007,7 +1007,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 	// client wants to 'erase' current entries
 	if(uiDecompressedSize == 0)
 	{
-		SetAccountData(uiID, NULL, false,0);
+		SetAccountData(uiID, nullptr, false,0);
 		return;
 	}
 
@@ -1192,7 +1192,7 @@ void WorldSession::HandleAmmoSetOpcode(WorldPacket & recv_data)
 	{
 		if(GetPlayer()->getLevel() < xproto->RequiredLevel)
 		{
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr,nullptr,INV_ERR_ITEM_RANK_NOT_ENOUGH);
 			_player->SetUInt32Value(PLAYER_AMMO_ID, 0);
 			_player->CalcDamage();
 			return;
@@ -1202,7 +1202,7 @@ void WorldSession::HandleAmmoSetOpcode(WorldPacket & recv_data)
 	{
 		if(!GetPlayer()->_HasSkillLine(xproto->RequiredSkill))
 		{
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr,nullptr,INV_ERR_ITEM_RANK_NOT_ENOUGH);
 			_player->SetUInt32Value(PLAYER_AMMO_ID, 0);
 			_player->CalcDamage();
 			return;
@@ -1212,7 +1212,7 @@ void WorldSession::HandleAmmoSetOpcode(WorldPacket & recv_data)
 		{
 			if(_player->_GetSkillLineCurrent(xproto->RequiredSkill, false) < xproto->RequiredSkillRank)
 			{
-				GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+				GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr,nullptr,INV_ERR_ITEM_RANK_NOT_ENOUGH);
 				_player->SetUInt32Value(PLAYER_AMMO_ID, 0);
 				_player->CalcDamage();
 				return;
@@ -1234,8 +1234,8 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	uint64 guid;
 	recv_data >> guid;
 	SpellCastTargets targets;
-	Spell *spell = NULL;;
-	SpellEntry *spellInfo = NULL;;
+	Spell *spell = nullptr;;
+	SpellEntry *spellInfo = nullptr;;
 	sLog.outDebug("WORLD: CMSG_GAMEOBJ_USE: [GUID %d]", guid);   
 
 	GameObject *obj = _player->GetMapMgr()->GetGameObject((uint32)guid);
@@ -1267,7 +1267,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	case GAMEOBJECT_TYPE_CHEST://cast da spell
 		{
 			spellInfo = dbcSpell.LookupEntry( OPEN_CHEST );
-			spell = new Spell(plyr, spellInfo, true, NULL);
+			spell = new Spell(plyr, spellInfo, true, nullptr);
 			_player->m_currentSpell = spell;
 			targets.m_unitTarget = obj->GetGUID();
 			spell->prepare(&targets); 
@@ -1318,7 +1318,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 			SpellEntry *info = dbcSpell.LookupEntry(goinfo->SpellFocus);
 			if(!info)
 				break;
-			Spell * spell = new Spell(plyr, info, false, NULL);
+			Spell * spell = new Spell(plyr, info, false, nullptr);
 			//spell->SpellByOther = true;
 			SpellCastTargets targets;
 			targets.m_unitTarget = plyr->GetGUID();
@@ -1365,7 +1365,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					}
 				}
 				
-				SpellEntry *info = NULL;				
+				SpellEntry *info = nullptr;				
 				if(goinfo->ID == 36727) // summon portal
 				{
 					if(!obj->m_ritualtarget)
@@ -1377,15 +1377,15 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					if(!target)
 						return;
 
-					spell = new Spell(obj,info,true,NULL);
+					spell = new Spell(obj,info,true,nullptr);
 					SpellCastTargets targets;
 					targets.m_unitTarget = target->GetGUID();
 					spell->prepare(&targets);
 				}
 				else if(goinfo->ID == 177193) // doom portal
 				{
-					Player *psacrifice = NULL;
-					Spell * spell = NULL;
+					Player *psacrifice = nullptr;
+					Spell * spell = nullptr;
 					
 					// kill the sacrifice player
 					psacrifice = _player->GetMapMgr()->GetPlayer(obj->m_ritualmembers[(int)(rand()%(goinfo->SpellFocus-1))]);
@@ -1396,13 +1396,13 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					info = dbcSpell.LookupEntry(goinfo->sound4);
 					if(!info)
 						break;
-					spell = new Spell(psacrifice, info, true, NULL);
+					spell = new Spell(psacrifice, info, true, nullptr);
 					targets.m_unitTarget = psacrifice->GetGUID();
 					spell->prepare(&targets);
 					
 					// summons demon		   
 					info = dbcSpell.LookupEntry(goinfo->sound1);
-					spell = new Spell(pCaster, info, true, NULL);
+					spell = new Spell(pCaster, info, true, nullptr);
 					SpellCastTargets targets;
 					targets.m_unitTarget = pCaster->GetGUID();
 					spell->prepare(&targets);					
@@ -1439,7 +1439,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 
 			/* these are usually scripted effects. but in the case of some, (e.g. orb of translocation) the spellid is located in unknown1 */
 			SpellEntry * sp = dbcSpell.LookupEntryForced(goinfo->Unknown1);
-			if(sp != NULL)
+			if(sp != nullptr)
 				_player->CastSpell(_player,sp,true);
 		}break;
 	case GAMEOBJECT_TYPE_MEETINGSTONE:	// Meeting Stone
@@ -1621,7 +1621,7 @@ void WorldSession::HandleSelfResurrectOpcode(WorldPacket& recv_data)
 	if(self_res_spell)
 	{
 		SpellEntry * sp=dbcSpell.LookupEntry(self_res_spell);
-		Spell *s=new Spell(_player,sp,true,NULL);
+		Spell *s=new Spell(_player,sp,true,nullptr);
 		SpellCastTargets tgt;
 		tgt.m_unitTarget=_player->GetGUID();
 		s->prepare(&tgt);	
@@ -1663,8 +1663,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	uint8 error = 0;
 	SlotResult slotresult;
 
-	Creature *pCreature = NULL;
-	Loot *pLoot = NULL;
+	Creature *pCreature = nullptr;
+	Loot *pLoot = nullptr;
 	/* struct:
 	{CLIENT} Packet: (0x02A3) CMSG_LOOT_MASTER_GIVE PacketSize = 17
 	|------------------------------------------------|----------------|
@@ -1683,7 +1683,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	uint8 slotid;
 	recv_data >> creatureguid >> slotid >> target_playerguid;
 
-	if(_player->GetGroup() == NULL || _player->GetGroup()->GetLooter() != _player->m_playerInfo)
+	if(_player->GetGroup() == nullptr || _player->GetGroup()->GetLooter() != _player->m_playerInfo)
 		return;
 
 	Player *player = _player->GetMapMgr()->GetPlayer((uint32)target_playerguid);
@@ -1717,7 +1717,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	{
 		if (!amt)//Test for party loot
 		{  
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr,INV_ERR_ALREADY_LOOTED);
 			return;
 		} 
 	}
@@ -1728,7 +1728,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 
 		if (pLoot->items.at(slotid).has_looted.end() != itr)
 		{
-			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr,INV_ERR_ALREADY_LOOTED);
 			return;
 		}
 	}
@@ -1738,21 +1738,21 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 
 	if((error = player->GetItemInterface()->CanReceiveItem(it, 1)))
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
+		_player->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, error);
 		return;
 	}
 	
 	slotresult = player->GetItemInterface()->FindFreeInventorySlot(it);
 	if(!slotresult.Result)
 	{
-		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
+		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, INV_ERR_INVENTORY_FULL);
 		return;
 	}
 
 	Item *item = objmgr.CreateItem( itemid, player);
 	
 	item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
-	if(pLoot->items.at(slotid).iRandomProperty!=NULL)
+	if(pLoot->items.at(slotid).iRandomProperty!=nullptr)
 	{
 		item->SetRandomProperty(pLoot->items.at(slotid).iRandomProperty->ID);
 		item->ApplyRandomProperties(false);
@@ -1828,7 +1828,7 @@ void WorldSession::HandleLootRollOpcode(WorldPacket& recv_data)
 	uint8 choice;
 	recv_data >> creatureguid >> slotid >> choice;
 
-	LootRoll *li = NULL;
+	LootRoll *li = nullptr;
 
 	uint32 guidtype = GET_TYPE_FROM_GUID(creatureguid);
 	if (guidtype == HIGHGUID_TYPE_GAMEOBJECT) 
@@ -1895,7 +1895,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 		}
 
 		pItem->m_isDirty=true;
-		pItem->SaveToDB(containerslot,slot, false, NULL);
+		pItem->SaveToDB(containerslot,slot, false, nullptr);
 		return;
 	}
 
@@ -1916,13 +1916,13 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 				}
 				else
 				{
-					_player->GetItemInterface()->BuildInventoryChangeError(pItem,NULL,INV_ERR_ITEM_LOCKED);
+					_player->GetItemInterface()->BuildInventoryChangeError(pItem,nullptr,INV_ERR_ITEM_LOCKED);
 					return;
 				}
 			}
 			else if(lock->locktype[i] == 2 && pItem->locked)
 			{
-				_player->GetItemInterface()->BuildInventoryChangeError(pItem,NULL,INV_ERR_ITEM_LOCKED);
+				_player->GetItemInterface()->BuildInventoryChangeError(pItem,nullptr,INV_ERR_ITEM_LOCKED);
 				return;
 			}
 		}

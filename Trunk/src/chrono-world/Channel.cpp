@@ -63,7 +63,7 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 #endif
 
 	pDBC = dbcChatChannels.LookupEntryForced(type_id);
-	if( pDBC != NULL )
+	if( pDBC != nullptr )
 	{
 		m_general = true;
 		m_announce = false;
@@ -135,7 +135,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 	if(m_announce)
 	{
 		data << uint8(CHANNEL_NOTIFY_FLAG_JOINED) << m_name << plr->GetGUID();
-		SendToAll(&data, NULL);
+		SendToAll(&data, nullptr);
 	}
 	
 	data.clear();
@@ -201,7 +201,7 @@ void Channel::Part(Player * plr)
 	if(flags & CHANNEL_FLAG_OWNER)
 	{
 		// we need to find a new owner
-		SetOwner(NULL, NULL);
+		SetOwner(nullptr, nullptr);
 	}
 
 	if(plr->GetSession() && plr->GetSession()->IsLoggingOut())
@@ -237,10 +237,10 @@ void Channel::Part(Player * plr)
 void Channel::SetOwner(Player * oldpl, Player * plr)
 {
 	Guard mGuard(m_lock);
-	Player * pOwner = NULL;
+	Player * pOwner = nullptr;
 	uint32 oldflags, oldflags2;
 	WorldPacket data(SMSG_CHANNEL_NOTIFY, 100);
-	if(oldpl != NULL)
+	if(oldpl != nullptr)
 	{
 		MemberMap::iterator itr = m_members.find(oldpl);
 		if(m_members.end() == itr)
@@ -258,7 +258,7 @@ void Channel::SetOwner(Player * oldpl, Player * plr)
 		}
 	}
 
-	if(plr == NULL)
+	if(plr == nullptr)
 	{
 		for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
 		{
@@ -272,7 +272,7 @@ void Channel::SetOwner(Player * oldpl, Player * plr)
 			}
 			else
 			{
-				if(pOwner == NULL)
+				if(pOwner == nullptr)
 				{
 					pOwner = itr->first;
 					oldflags = itr->second;
@@ -305,7 +305,7 @@ void Channel::SetOwner(Player * oldpl, Player * plr)
 		}
 	}
 
-	if(pOwner == NULL)
+	if(pOwner == nullptr)
 		return;		// obviously no members
 
 	data.clear();
@@ -411,7 +411,7 @@ void Channel::Say(Player * plr, const char * message, Player * for_gm_client, bo
 	data << uint32(strlen(message)+1);
 	data << message;
 	data << (uint8)(plr->bGMTagOn ? 4 : 0);
-	if(for_gm_client != NULL)
+	if(for_gm_client != nullptr)
 		for_gm_client->GetSession()->SendPacket(&data);
 	else
 		SendToAll(&data);
@@ -483,7 +483,7 @@ void Channel::Kick(Player * plr, Player * die_player, bool ban)
 #endif
 
 	if(flags & CHANNEL_FLAG_OWNER)
-		SetOwner(NULL, NULL);
+		SetOwner(nullptr, nullptr);
 
 	if(ban)
 		m_bannedMembers.insert(die_player->GetLowGUID());
@@ -875,7 +875,7 @@ Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p, uint32 type
 	ChannelList::iterator itr;
 	ChannelList * cl = &Channels[0];
 	Channel * chn;
-	if( seperatechannels && p != NULL )
+	if( seperatechannels && p != nullptr )
 		cl = &Channels[p->GetTeam()];
 
 	lock.Acquire();
@@ -896,12 +896,12 @@ Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p, uint32 type
 		{
 			lock.Release();
 			m_confSettingLock.Release();
-			return NULL;
+			return nullptr;
 		}
 	}
 	m_confSettingLock.Release();
 
-	chn = new Channel(name, ( seperatechannels && p != NULL ) ? p->GetTeam() : 0, type_id);
+	chn = new Channel(name, ( seperatechannels && p != nullptr ) ? p->GetTeam() : 0, type_id);
 	cl->insert(make_pair(chn->m_name, chn));
 	lock.Release();
 	return chn;
@@ -925,7 +925,7 @@ Channel * ChannelMgr::GetChannel(const char *name, Player * p)
 	}
 
 	lock.Release();
-	return NULL;
+	return nullptr;
 }
 
 Channel * ChannelMgr::GetChannel(const char *name, uint32 team)
@@ -946,7 +946,7 @@ Channel * ChannelMgr::GetChannel(const char *name, uint32 team)
 	}
 
 	lock.Release();
-	return NULL;
+	return nullptr;
 }
 
 void ChannelMgr::RemoveChannel(Channel * chn)

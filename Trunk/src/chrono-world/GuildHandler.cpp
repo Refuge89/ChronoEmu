@@ -126,7 +126,7 @@ void WorldSession::HandleGuildAccept(WorldPacket & recv_data)
 		return;
 	}
 
-	pGuild->AddGuildMember(plyr->m_playerInfo, NULL);
+	pGuild->AddGuildMember(plyr->m_playerInfo, nullptr);
 }
 
 void WorldSession::HandleGuildDecline(WorldPacket & recv_data)
@@ -167,7 +167,7 @@ void WorldSession::HandleSetGuildInformation(WorldPacket & recv_data)
 
 void WorldSession::HandleGuildInfo(WorldPacket & recv_data)
 {
-	if(_player->GetGuild() != NULL)
+	if(_player->GetGuild() != nullptr)
 		_player->GetGuild()->SendGuildInfo(this);
 }
 
@@ -193,7 +193,7 @@ void WorldSession::HandleGuildPromote(WorldPacket & recv_data)
 	}
 
 	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name.c_str());
-	if(dstplr==NULL)
+	if(dstplr==nullptr)
 		return;
 
 	_player->m_playerInfo->guild->PromoteGuildMember(dstplr, this);
@@ -213,7 +213,7 @@ void WorldSession::HandleGuildDemote(WorldPacket & recv_data)
 	}
 
 	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name.c_str());
-	if(dstplr==NULL)
+	if(dstplr==nullptr)
 		return;
 
 	_player->m_playerInfo->guild->DemoteGuildMember(dstplr, this);
@@ -244,7 +244,7 @@ void WorldSession::HandleGuildRemove(WorldPacket & recv_data)
 	}
 
 	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name.c_str());
-	if(dstplr==NULL)
+	if(dstplr==nullptr)
 		return;
 
 	_player->m_playerInfo->guild->RemoveGuildMember(dstplr, this);
@@ -281,7 +281,7 @@ void WorldSession::HandleGuildLeader(WorldPacket & recv_data)
 	}
 
 	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name.c_str());
-	if(dstplr==NULL)
+	if(dstplr==nullptr)
 		return;
 
 	_player->m_playerInfo->guild->ChangeGuildMaster(dstplr, this);
@@ -324,7 +324,7 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 
 	recv_data >> rankId;
 	pRank = _player->m_playerInfo->guild->GetGuildRank(rankId);
-	if(pRank == NULL)
+	if(pRank == nullptr)
 		return;
 
 	recv_data >> pRank->iRights;
@@ -351,7 +351,7 @@ void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
 	string rankName;
 	Guild * pGuild = _player->GetGuild();
 
-	if(pGuild == NULL)
+	if(pGuild == nullptr)
 	{
 		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PLAYER_NOT_IN_GUILD);
 		return;
@@ -370,7 +370,7 @@ void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
 	pGuild->CreateGuildRank(rankName.c_str(), GR_RIGHT_DEFAULT, false);
 
 	// there is probably a command result for this. need to find it.
-	pGuild->SendGuildQuery(NULL);
+	pGuild->SendGuildQuery(nullptr);
 	pGuild->SendGuildRoster(this);
 }
 
@@ -378,7 +378,7 @@ void WorldSession::HandleGuildDelRank(WorldPacket & recv_data)
 {
 	Guild * pGuild = _player->GetGuild();
 
-	if(pGuild == NULL)
+	if(pGuild == nullptr)
 	{
 		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PLAYER_NOT_IN_GUILD);
 		return;
@@ -393,7 +393,7 @@ void WorldSession::HandleGuildDelRank(WorldPacket & recv_data)
 	pGuild->RemoveGuildRank(this);
 
 	// there is probably a command result for this. need to find it.
-	pGuild->SendGuildQuery(NULL);
+	pGuild->SendGuildQuery(nullptr);
 	pGuild->SendGuildRoster(this);
 }
 
@@ -403,7 +403,7 @@ void WorldSession::HandleGuildSetPublicNote(WorldPacket & recv_data)
 	recv_data >> target >> newnote;
 
 	PlayerInfo * pTarget = objmgr.GetPlayerInfoByName(target.c_str());
-	if(pTarget == NULL)
+	if(pTarget == nullptr)
 		return;
 
 	if(!pTarget->guild)
@@ -418,7 +418,7 @@ void WorldSession::HandleGuildSetOfficerNote(WorldPacket & recv_data)
 	recv_data >> target >> newnote;
 
 	PlayerInfo * pTarget = objmgr.GetPlayerInfoByName(target.c_str());
-	if(pTarget == NULL)
+	if(pTarget == nullptr)
 		return;
 
 	if(!pTarget->guild)
@@ -441,7 +441,7 @@ void WorldSession::HandleSaveGuildEmblem(WorldPacket & recv_data)
 	CHECK_GUID_EXISTS(guid);
 
 	recv_data >> emblemStyle >> emblemColor >> borderStyle >> borderColor >> backgroundColor;
-	if(pGuild==NULL)
+	if(pGuild==nullptr)
 	{
 		data << uint32(ERR_GUILDEMBLEM_NOGUILD);
 		SendPacket(&data);
@@ -469,7 +469,7 @@ void WorldSession::HandleSaveGuildEmblem(WorldPacket & recv_data)
 	pGuild->SetTabardInfo(emblemStyle, emblemColor, borderStyle, borderColor, backgroundColor);
 
 	// update all clients (probably is an event for this, again.)
-	pGuild->SendGuildQuery(NULL);
+	pGuild->SendGuildQuery(nullptr);
 }
 
 // Charter part
@@ -533,7 +533,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 	error = _player->GetItemInterface()->CanReceiveItem(ItemPrototypeStorage.LookupEntry(ITEM_ENTRY_GUILD_CHARTER),1);
 	if(error)
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,error);
+		_player->GetItemInterface()->BuildInventoryChangeError(nullptr,nullptr,error);
 	}
 	else
 	{

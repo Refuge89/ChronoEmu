@@ -77,7 +77,7 @@ bool ChatHandler::HandleRenameAllCharacter(const char * args, WorldSession * m_s
 			{
 				printf("renaming character %s, %u\n", pName,uGuid);
                 Player * pPlayer = objmgr.GetPlayer(uGuid);
-				if( pPlayer != NULL )
+				if( pPlayer != nullptr )
 				{
 					pPlayer->rename_pending = true;
 					pPlayer->GetSession()->SystemMessage("Your character has had a force rename set, you will be prompted to rename your character at next login in conformance with server rules.");
@@ -278,11 +278,11 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pn->gender = pNewChar->getGender();
 	pn->m_Group=0;
 	pn->subGroup=0;
-	pn->m_loggedInPlayer=NULL;
+	pn->m_loggedInPlayer=nullptr;
 	pn->team = pNewChar->GetTeam ();
-	pn->guild=NULL;
-	pn->guildRank=NULL;
-	pn->guildMember=NULL;
+	pn->guild=nullptr;
+	pn->guildRank=nullptr;
+	pn->guildMember=nullptr;
 #ifdef VOICE_CHAT
 	pn->groupVoiceId = -1;
 #endif
@@ -390,14 +390,14 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	if(objmgr.GetPlayer((uint32)guid) != NULL)
+	if(objmgr.GetPlayer((uint32)guid) != nullptr)
 	{
 		// "Char deletion failed"
 		//fail = 0x3B;
 	} else {
 
 		PlayerInfo * inf = objmgr.GetPlayerInfo((uint32)guid);
-		if( inf != NULL && inf->m_loggedInPlayer == NULL )
+		if( inf != nullptr && inf->m_loggedInPlayer == nullptr )
 		{
 			QueryResult * result = CharacterDatabase.Query("SELECT name FROM characters WHERE guid = %u AND acct = %u", (uint32)guid, _accountId);
 			if(!result)
@@ -408,7 +408,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 				if(inf->guild->GetGuildLeader()==inf->guid)
 					inf->guild->Disband();
 				else
-					inf->guild->RemoveGuildMember(inf,NULL);
+					inf->guild->RemoveGuildMember(inf,nullptr);
 			}
 
 			string name = result->Fetch()[0].GetString();
@@ -417,12 +417,12 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 			for(int i = 0; i < NUM_CHARTER_TYPES; ++i)
 			{
 				Charter * c = objmgr.GetCharterByGuid(guid, (CharterTypes)i);
-				if(c != NULL)
+				if(c != nullptr)
 					c->RemoveSignature((uint32)guid);
 			}
 
 			
-			/*if( _socket != NULL )
+			/*if( _socket != nullptr )
 				sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());*/
 			
 			sPlrLog.writefromsession(this, "deleted character %s (GUID: %u)", name.c_str(), (uint32)guid);
@@ -534,7 +534,7 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 	sLog.outDebug( "WORLD: Recvd Player Logon Message" );
 
 	recv_data >> playerGuid; // this is the GUID selected by the player
-	if(objmgr.GetPlayer((uint32)playerGuid) != NULL || m_loggingInPlayer || _player)
+	if(objmgr.GetPlayer((uint32)playerGuid) != nullptr || m_loggingInPlayer || _player)
 	{
 		// A character with that name already exists 0x3E
 		uint8 respons = CHAR_LOGIN_DUPLICATE_CHARACTER;
@@ -593,9 +593,9 @@ void WorldSession::FullLogin(Player * plr)
 		info->lastZone = plr->GetZoneId();
 		info->race = plr->getRace();
 		info->team = plr->GetTeam();
-		info->guild=NULL;
-		info->guildRank=NULL;
-		info->guildMember=NULL;
+		info->guild=nullptr;
+		info->guildRank=nullptr;
+		info->guildMember=nullptr;
 		info->m_Group=0;
 		info->subGroup=0;
 		objmgr.AddPlayerInfo(info);
@@ -796,7 +796,7 @@ bool ChatHandler::HandleRenameCommand(const char * args, WorldSession * m_sessio
 		return true;
 	}
 
-	if( objmgr.GetPlayerInfoByName(new_name.c_str()) != NULL )
+	if( objmgr.GetPlayerInfoByName(new_name.c_str()) != nullptr )
 	{
 		RedSystemMessage(m_session, "Player found with this name in use already.");
 		return true;

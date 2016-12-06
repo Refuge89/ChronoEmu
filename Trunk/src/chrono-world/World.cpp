@@ -21,8 +21,8 @@
 
 initialiseSingleton( World );
 
-DayWatcherThread* dw = NULL;
-CharacterLoaderThread* ctl = NULL;
+DayWatcherThread* dw = nullptr;
+CharacterLoaderThread* ctl = nullptr;
 
 float World::m_movementCompressThreshold;
 float World::m_movementCompressThresholdCreatures;
@@ -61,7 +61,7 @@ World::World()
 	SocketRecvBufSize = WORLDSOCKET_RECVBUF_SIZE;
 #endif
 	m_limitedNames=false;
-	m_banTable = NULL;
+	m_banTable = nullptr;
 	m_lfgForNonLfg = false;
 	m_speedHackThreshold = -500.0f;
 	m_speedHackLatencyMultiplier = 0.0f;
@@ -343,7 +343,7 @@ bool World::SetInitialWorldSettings()
 	uint32 start_time = getMSTime();
 	if( !LoadDBCs() )
 	{
-		Log.LargeErrorMessage(LARGERRORMESSAGE_ERROR, "One or more of the DBC files are missing.", "These are absolutely necessary for the server to function.", "The server will not start without them.", NULL);
+		Log.LargeErrorMessage(LARGERRORMESSAGE_ERROR, "One or more of the DBC files are missing.", "These are absolutely necessary for the server to function.", "The server will not start without them.", nullptr);
 		return false;
 	}
 
@@ -535,11 +535,11 @@ bool World::SetInitialWorldSettings()
     for( uint32 i = 0; i < dbcTalent.GetNumRows(); ++i )
     {
         TalentEntry const* talent_info = dbcTalent.LookupRow( i );
-		if( talent_info == NULL )
+		if( talent_info == nullptr )
 			continue;
 
 		TalentTabEntry const* tab_info = dbcTalentTab.LookupEntry( talent_info->TalentTree );
-		if( tab_info == NULL )
+		if( tab_info == nullptr )
 			continue;
 
         talent_max_rank = 0;
@@ -559,7 +559,7 @@ bool World::SetInitialWorldSettings()
 	for( uint32 i = 1; i < dbcTalentTab.GetNumRows(); ++i )
 	{
 		TalentTabEntry const* tab_info = dbcTalentTab.LookupRow( i );
-		if( tab_info == NULL )
+		if( tab_info == nullptr )
 			continue;
 
 		talent_pos = 0;
@@ -576,7 +576,7 @@ bool World::SetInitialWorldSettings()
 		{
 			uint32 talent_id = itr->first & 0xFFFF;
 			TalentEntry const* talent_info = dbcTalent.LookupEntry( talent_id );
-			if( talent_info == NULL )
+			if( talent_info == nullptr )
 				continue;
 
 			if( talent_info->TalentTree != tab_info->TalentTabID )
@@ -634,7 +634,7 @@ void World::SendMessageToGMs(WorldSession *self, const char * text, ...)
 	SessionMap::iterator itr;
 	for (itr = m_sessions.begin(); itr != m_sessions.end(); itr++)
 	{
-		if( itr->second != self && itr->second->HasGMPermissions() && itr->second->GetPlayer() != NULL )
+		if( itr->second != self && itr->second->HasGMPermissions() && itr->second->GetPlayer() != nullptr )
 			itr->second->SendPacket(data);
 	}
 	m_sessionlock.ReleaseReadLock();
@@ -1105,7 +1105,7 @@ void TaskList::wait()
 		queueLock.Release();
 
 		// keep updating time lol
-		t = time(NULL);
+		t = time(nullptr);
 		if( UNIXTIME != t )
 		{
 			UNIXTIME = t;
@@ -1343,10 +1343,10 @@ void World::Rehash(bool load)
 	m_wallhackthreshold = Config.MainConfig.GetFloatDefault("AntiHack", "WallHackThreshold", 5.0f);
 	// ======================================
 
-	if( m_banTable != NULL )
+	if( m_banTable != nullptr )
 		free( m_banTable );
 
-	m_banTable = NULL;
+	m_banTable = nullptr;
 	string s = Config.MainConfig.GetStringDefault( "Server", "BanTable", "" );
 	if( !s.empty() )
 		m_banTable = strdup( s.c_str() );
@@ -1368,7 +1368,7 @@ void World::LoadNameGenData()
 	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
 	{
 		NameGenData d;
-		if(dbc.getRecord(i).getString(1)==NULL)
+		if(dbc.getRecord(i).getString(1)==nullptr)
 			continue;
 
 		d.name = string(dbc.getRecord(i).getString(1));
@@ -1380,7 +1380,7 @@ void World::LoadNameGenData()
 void World::CharacterEnumProc(QueryResultVector& results, uint32 AccountId)
 {
 	WorldSession * s = FindSession(AccountId);
-	if(s == NULL)
+	if(s == nullptr)
 		return;
 
 	s->CharacterEnumProc(results[0].result);
@@ -1389,7 +1389,7 @@ void World::CharacterEnumProc(QueryResultVector& results, uint32 AccountId)
 void World::LoadAccountDataProc(QueryResultVector& results, uint32 AccountId)
 {
 	WorldSession * s = FindSession(AccountId);
-	if(s == NULL)
+	if(s == nullptr)
 		return;
 
 	s->LoadAccountDataProc(results[0].result);
@@ -1409,7 +1409,7 @@ void World::CleanupCheaters()
 	SpellEntry * sp;
 
 	QueryResult * result = CharacterDatabase.Query("SELECT guid, name, class, level, available_talent_points, spells FROM characters");
-	if(result == NULL)
+	if(result == nullptr)
 		return;
 
 	do 
@@ -1460,7 +1460,7 @@ void World::PollMailboxInsertQueue(DatabaseConnection * con)
 	result = CharacterDatabase.FQuery("SELECT * FROM mailbox_insert_queue", con);
 	CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
 	CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
-	if( result != NULL )
+	if( result != nullptr )
 	{
 		Log.Notice("MailboxQueue", "Sending %u queued messages....", result->GetRowCount());
 		do 
@@ -1471,21 +1471,21 @@ void World::PollMailboxInsertQueue(DatabaseConnection * con)
 			
 			if( itemid != 0 )
 			{
-				pItem = objmgr.CreateItem( itemid, NULL );
-				if( pItem != NULL )
+				pItem = objmgr.CreateItem( itemid, nullptr );
+				if( pItem != nullptr )
 				{
 					pItem->SetUInt32Value( ITEM_FIELD_STACK_COUNT, stackcount );
-					pItem->SaveToDB( 0, 0, true, NULL );
+					pItem->SaveToDB( 0, 0, true, nullptr );
 				}
 			}
 			else
-				pItem = NULL;
+				pItem = nullptr;
 
 			Log.Notice("MailboxQueue", "Sending message to %u (item: %u)...", f[1].GetUInt32(), itemid);
 			sMailSystem.SendAutomatedMessage( 0, f[0].GetUInt64(), f[1].GetUInt64(), f[2].GetString(), f[3].GetString(), f[5].GetUInt32(),
 				0, pItem ? pItem->GetGUID() : 0, f[4].GetUInt32() );
 
-			if( pItem != NULL )
+			if( pItem != nullptr )
 				delete pItem;
 
 		} while ( result->NextRow() );
@@ -1546,13 +1546,13 @@ struct insert_playeritem
 bool CharacterLoaderThread::run()
 {
 #ifdef WIN32
-	hEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
+	hEvent = CreateEvent(nullptr,FALSE,FALSE,nullptr);
 #else
 	struct timeval now;
 	struct timespec tv;
 
-	pthread_mutex_init(&mutex,NULL);
-	pthread_cond_init(&cond,NULL);
+	pthread_mutex_init(&mutex,nullptr);
+	pthread_cond_init(&cond,nullptr);
 #endif
 	for(;;)
 	{
@@ -1574,7 +1574,7 @@ bool CharacterLoaderThread::run()
 		if (hEvent)
 			WaitForSingleObject(hEvent,LOAD_THREAD_SLEEP*1000);
 #else
-		gettimeofday(&now, NULL);
+		gettimeofday(&now, nullptr);
 		tv.tv_sec = now.tv_sec + LOAD_THREAD_SLEEP;
 		tv.tv_nsec = now.tv_usec * 1000;
 		pthread_mutex_lock(&mutex);
@@ -1597,7 +1597,7 @@ void World::PollMailboxInsertQueue(DatabaseConnection * con)
 	uint32 stackcount;
 
 	result = CharacterDatabase.FQuery("SELECT * FROM mailbox_insert_queue", con);
-	if( result != NULL )
+	if( result != nullptr )
 	{
 		Log.Notice("MailboxQueue", "Sending queued messages....");
 		do 
@@ -1608,21 +1608,21 @@ void World::PollMailboxInsertQueue(DatabaseConnection * con)
 
 			if( itemid != 0 )
 			{
-				pItem = objmgr.CreateItem( itemid, NULL );
-				if( pItem != NULL )
+				pItem = objmgr.CreateItem( itemid, nullptr );
+				if( pItem != nullptr )
 				{
 					pItem->SetUInt32Value( ITEM_FIELD_STACK_COUNT, stackcount );
-					pItem->SaveToDB( 0, 0, true, NULL );
+					pItem->SaveToDB( 0, 0, true, nullptr );
 				}
 			}
 			else
-				pItem = NULL;
+				pItem = nullptr;
 
 			Log.Notice("MailboxQueue", "Sending message to %u (item: %u)...", f[1].GetUInt32(), itemid);
 			sMailSystem.SendAutomatedMessage( 0, f[0].GetUInt64(), f[1].GetUInt64(), f[2].GetString(), f[3].GetString(), f[5].GetUInt32(),
 				0, pItem ? pItem->GetGUID() : 0, f[4].GetUInt32() );
 
-			if( pItem != NULL )
+			if( pItem != nullptr )
 				delete pItem;
 
 		} while ( result->NextRow() );
@@ -1763,11 +1763,11 @@ void World::PollCharacterInsertQueue(DatabaseConnection * con)
 			inf->lastLevel = f[7].GetUInt32();
 			inf->lastOnline = UNIXTIME;
 			inf->lastZone = 0;
-			inf->m_Group=NULL;
-			inf->m_loggedInPlayer=NULL;
-			inf->guild=NULL;
-			inf->guildRank=NULL;
-			inf->guildMember=NULL;
+			inf->m_Group=nullptr;
+			inf->m_loggedInPlayer=nullptr;
+			inf->guild=nullptr;
+			inf->guildRank=nullptr;
+			inf->guildMember=nullptr;
 			inf->race=f[3].GetUInt32();
 			inf->subGroup=0;
 			switch(inf->race)
@@ -1981,7 +1981,7 @@ void World::UpdateShutdownStatus()
 			char tbuf[100];
 			snprintf(tbuf, 100, "%02u:%02u", (time_left / 60), (time_left % 60));
 			data << tbuf;
-			SendGlobalMessage(&data, NULL);
+			SendGlobalMessage(&data, nullptr);
 
 			printf("Server shutdown in %s.\n", tbuf);
 		}
@@ -1992,7 +1992,7 @@ void World::UpdateShutdownStatus()
 		sEventMgr.RemoveEvents(this, EVENT_WORLD_SHUTDOWN);
 		if( m_shutdownTime )
 		{
-			SendWorldText("Server is saving and shutting down. You will be disconnected shortly.", NULL);
+			SendWorldText("Server is saving and shutting down. You will be disconnected shortly.", nullptr);
 			Master::m_stopEvent = true;
 		}
 		else
@@ -2004,7 +2004,7 @@ void World::UpdateShutdownStatus()
 				data << uint32(SERVER_MSG_SHUTDOWN_CANCELLED);
 
 			data << uint8(0);
-			SendGlobalMessage(&data, NULL);
+			SendGlobalMessage(&data, nullptr);
 		}
 	}
 }
@@ -2029,7 +2029,7 @@ void World::QueueShutdown(uint32 delay, uint32 type)
 	// send message
 	char buf[1000];
 	snprintf(buf, 1000, "Server %s initiated. Server will save and shut down in approx. %u seconds.", type == SERVER_SHUTDOWN_TYPE_RESTART ? "restart" : "shutdown", delay);
-	SendWorldText(buf, NULL);
+	SendWorldText(buf, nullptr);
 }
 
 
@@ -2045,7 +2045,7 @@ void World::BackupDB()
 	  "playercooldowns", "playeritems", "playeritems_insert_queue", "playerpets",
 	  "playerpetspells", "playersummons", "playersummonspells", "questlog",
 	  "server_settings", "social_friends", "social_ignores", "tutorials",
-	  "worldstate_save_data", NULL };
+	  "worldstate_save_data", nullptr };
 	char cmd[1024];
 	char datestr[256];
 	char path[256];
@@ -2059,7 +2059,7 @@ void World::BackupDB()
 	pass = Config.MainConfig.GetStringDefault("CharacterDatabase", "Password", "");
 	host = Config.MainConfig.GetStringDefault("CharacterDatabase", "Hostname", "");
 	name = Config.MainConfig.GetStringDefault("CharacterDatabase", "Name", "");
-	t = time(NULL);
+	t = time(nullptr);
 	localtime_r(&t, &tm);
 	strftime(datestr, 256, "%Y.%m.%d", &tm);
 
@@ -2068,7 +2068,7 @@ void World::BackupDB()
 
 	sLog.outString("Backing up character db into %s", path);
 
-	for (i=0; tables[i] != NULL; i++)
+	for (i=0; tables[i] != nullptr; i++)
 	{
 		snprintf(cmd, 1024, "mkdir -p %s", path);
 		system(cmd);
