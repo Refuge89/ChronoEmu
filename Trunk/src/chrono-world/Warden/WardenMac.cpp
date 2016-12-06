@@ -130,10 +130,9 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
     if (memcmp(buff.contents() + 1, sha1.GetDigest(), 20) != 0)
     {
         sLog.outString("Request hash reply: failed");
-        // COME BACK
 		
-		//if (sWorld.getConfig(CONFIG_BOOL_WARDEN_KICK))
-        //    Client->Disconnect();
+		if (sWorld.m_WardenEnabled)
+            Client->Disconnect();
         return;
     }
 
