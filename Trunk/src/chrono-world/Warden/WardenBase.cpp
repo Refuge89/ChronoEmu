@@ -15,7 +15,7 @@ WardenBase::~WardenBase()
 {
     delete[] Module->CompressedData;
     delete Module;
-    Module = NULL;
+    Module = nullptr;
     m_initialized = false;
 }
 
@@ -27,7 +27,7 @@ void WardenBase::Init(WorldSession *pClient, BigNumber *K)
 ClientWardenModule *WardenBase::GetModuleForClient(WorldSession *session)
 {
     ASSERT(false);
-    return NULL;
+    return nullptr;
 }
 
 void WardenBase::InitializeModule()

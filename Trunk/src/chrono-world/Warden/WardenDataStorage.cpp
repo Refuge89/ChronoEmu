@@ -113,7 +113,7 @@ WardenData *CWardenDataStorage::GetWardenDataById(uint32 Id)
     std::map<uint32, WardenData*>::const_iterator itr = _data_map.find(Id);
     if (itr != _data_map.end())
         return itr->second;
-    return NULL;
+    return nullptr;
 }
 
 WardenDataResult *CWardenDataStorage::GetWardenResultById(uint32 Id)
@@ -121,5 +121,5 @@ WardenDataResult *CWardenDataStorage::GetWardenResultById(uint32 Id)
     std::map<uint32, WardenDataResult*>::const_iterator itr = _result_map.find(Id);
     if (itr != _result_map.end())
         return itr->second;
-    return NULL;
+    return nullptr;
 }
