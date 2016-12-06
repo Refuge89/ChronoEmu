@@ -2024,8 +2024,10 @@ public:
 	map<uint32, uint32> m_forcedReactions;
 
 	uint32 m_speedhackCheckTimer;
-
-	void _SpeedhackCheck();		// save a call to getMSTime() yes i am a stingy bastard
+	uint32 m_flyhackCheckTimer;
+	void _SpeedhackCheck();
+	bool IsFlyHackEligible();
+	void _FlyhackCheck();
 
 	bool m_passOnLoot;
 	uint32 m_tradeSequence;

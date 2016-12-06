@@ -951,10 +951,18 @@ void Player::Update( uint32 p_time )
 	}
 
 
+	//
+	// Anti-Hack Checks
+	//
 	if( mstime >= m_speedhackCheckTimer )
 	{
 		_SpeedhackCheck();
 		m_speedhackCheckTimer = mstime + 1000;
+	}
+	if (mstime >= m_flyhackCheckTimer)
+	{
+		_FlyhackCheck();
+		m_flyhackCheckTimer = mstime + 5000;
 	}
 }
 
@@ -9893,74 +9901,6 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 	} while ( result->NextRow( ) );
 }
 
-void Player::_SpeedhackCheck()
-{
-	if( sWorld.antihack_speed && !GetTaxiState() && m_isMoving )
-	{
-		if( ( sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions() ) )
-			return; // do not check GMs speed been the config tells us not to.
-		if( m_position == m_lastHeartbeatPosition && m_isMoving )
-		{
-			// this means the client is probably lagging. don't update the timestamp, don't do anything until we start to receive
-			// packets again (give the poor laggers a chance to catch up)
-			return;
-		}
-
-		// simplified; just take the fastest speed. less chance of fuckups too
-		float speed = ( flying_aura ) ? m_flySpeed : m_runSpeed;
-		if( flying_aura )
-		{
-			if( m_runSpeed > m_flySpeed )
-				speed = m_runSpeed;
-		}
-
-		if( m_swimSpeed > speed )
-			speed = m_swimSpeed;
-
-		if( speed != m_lastHeartbeatV )
-		{
-			if( m_isMoving )
-				m_startMoveTime = m_lastMoveTime;
-			else
-				m_startMoveTime = 0;
-
-			m_lastHeartbeatPosition = m_position;
-			m_lastHeartbeatV = speed;
-			return;
-		}
-		
-		if( !m_heartbeatDisable && !m_uint32Values[UNIT_FIELD_CHARM] && m_TransporterGUID == 0 && !m_speedChangeInProgress )
-		{
-			// latency compensation a little
-			if( World::m_speedHackLatencyMultiplier > 0.0f )
-				speed += (float(m_session->GetLatency()) / 100.0f) * World::m_speedHackLatencyMultiplier; 
-
-
-			float distance = m_position.Distance2D( m_lastHeartbeatPosition );
-			uint32 time_diff = m_lastMoveTime - m_startMoveTime;
-			uint32 move_time = float2int32( ( distance / ( speed * 0.001f ) ) );
-			int32 difference = time_diff - move_time;
-			sLog.outDebug("speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
-			if( difference < World::m_speedHackThreshold )
-			{
-				if( m_speedhackChances != 0 )
-				{
-					SetMovement( MOVE_ROOT, 1 );
-					BroadcastMessage( "Speedhack detected. Please contact an admin with the below information if you believe this is a false detection." );
-					BroadcastMessage( "You will be disconnected in 10 seconds." );
-					BroadcastMessage( MSG_COLOR_WHITE"speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
-					sCheatLog.writefromsession(GetSession(), "Speed hack detected! Distance: %i, Speed: %f, Move: %u, tdiff: %u", distance, speed, move_time, time_diff);
-					if(m_bg)
-						m_bg->RemovePlayer(this, false);
-
-					sEventMgr.AddEvent(this, &Player::_Disconnect, EVENT_PLAYER_KICK, 10000, 1, 0 );
-					m_speedhackChances = 0;
-				}
-			}
-		}
-	}
-}
-
 void Player::_Disconnect()
 {
 	m_session->Disconnect();
@@ -10717,4 +10657,138 @@ void Player::_SaveHonorCP()
     m_honorCP.clear();
     m_honorCP = tempList;
     tempList.clear();
+}
+
+//
+// Anti-Cheat Checks
+// Non-Blizzlike To-Do - Warden Implementation
+//
+
+void Player::_SpeedhackCheck()
+{
+	if (sWorld.antihack_speed && !GetTaxiState() && m_isMoving)
+	{
+		if ((sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions()))
+			return; // do not check GMs speed been the config tells us not to.
+		if (m_position == m_lastHeartbeatPosition && m_isMoving)
+		{
+			// this means the client is probably lagging. don't update the timestamp, don't do anything until we start to receive
+			// packets again (give the poor laggers a chance to catch up)
+			return;
+		}
+
+		// simplified; just take the fastest speed. less chance of fuckups too
+		float speed = (flying_aura) ? m_flySpeed : m_runSpeed;
+		if (flying_aura)
+		{
+			if (m_runSpeed > m_flySpeed)
+				speed = m_runSpeed;
+		}
+
+		if (m_swimSpeed > speed)
+			speed = m_swimSpeed;
+
+		if (speed != m_lastHeartbeatV)
+		{
+			if (m_isMoving)
+				m_startMoveTime = m_lastMoveTime;
+			else
+				m_startMoveTime = 0;
+
+			m_lastHeartbeatPosition = m_position;
+			m_lastHeartbeatV = speed;
+			return;
+		}
+
+		if (!m_heartbeatDisable && !m_uint32Values[UNIT_FIELD_CHARM] && m_TransporterGUID == 0 && !m_speedChangeInProgress)
+		{
+			// latency compensation a little
+			if (World::m_speedHackLatencyMultiplier > 0.0f)
+				speed += (float(m_session->GetLatency()) / 100.0f) * World::m_speedHackLatencyMultiplier;
+
+
+			float distance = m_position.Distance2D(m_lastHeartbeatPosition);
+			uint32 time_diff = m_lastMoveTime - m_startMoveTime;
+			uint32 move_time = float2int32((distance / (speed * 0.001f)));
+			int32 difference = time_diff - move_time;
+			sLog.outDebug("speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff);
+			if (difference < World::m_speedHackThreshold)
+			{
+				if (m_speedhackChances != 0)
+				{
+					SetMovement(MOVE_ROOT, 1);
+					BroadcastMessage("Speedhack detected. Please contact an admin with the below information if you believe this is a false detection.");
+					BroadcastMessage("You will be disconnected in 10 seconds.");
+					BroadcastMessage(MSG_COLOR_WHITE"speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff);
+					sCheatLog.writefromsession(GetSession(), "Speed hack detected! Distance: %i, Speed: %f, Move: %u, tdiff: %u", distance, speed, move_time, time_diff);
+					if (m_bg)
+						m_bg->RemovePlayer(this, false);
+
+					sEventMgr.AddEvent(this, &Player::_Disconnect, EVENT_PLAYER_KICK, 10000, 1, 0);
+					m_speedhackChances = 0;
+				}
+			}
+		}
+	}
+}
+
+void Player::_FlyhackCheck()
+{
+	if (!GetMapMgr() || !GetMapMgr()->IsCollisionEnabled())
+		return;
+
+	if (!IsFlyHackEligible())
+		return;
+
+	// Get the current terrain height at this position
+	float height = CollideInterface.GetHeight(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ() + 2.0f);
+	if (height == NO_WMO_HEIGHT)
+	{
+		height = GetMapMgr()->GetLandHeight(GetPositionX(), GetPositionY());
+		if (height == 0.0f) // At this point, we just can't get a valid height.
+			return;
+	}
+
+	float diff = GetPositionZ() - height;
+	if (diff < 0)
+		diff = -diff;
+
+	if (diff <= 8.0f) // Relatively small threshold maybe?
+		return;
+
+	if (m_flyHackChances--)
+		return;
+
+	// Something's afoot!
+	EventTeleport(GetMapId(), GetPositionX(), GetPositionY(), height); // Return us to valid coordinates for the next logon.
+	GetSession()->Disconnect();
+}
+bool Player::IsFlyHackEligible()
+{
+	if (!sWorld.antihack_flight) return false;
+
+	if (GetSession()->HasGMPermissions())
+		return false;
+
+	// We are on a transport.
+	if (m_TransporterGUID != 0)
+		return false;
+
+	if (!GetMapMgr() || flying_aura || IsStunned() || IsPacified() || IsFeared() || GetTaxiState() || m_TransporterGUID != 0) // Stunned, rooted, riding a flying machine, whatever
+		return false;
+
+	if (GetMapId() == 369) return false; // Deeprun Tram
+
+	MovementInfo* moveInfo = GetSession()->GetMovementInfo();
+	if (!moveInfo) return false;
+
+	uint32 moveFlags = moveInfo->flags;
+
+	if (moveFlags & MOVEFLAG_FALLING || moveFlags & MOVEFLAG_FALLING_FAR || moveFlags & MOVEFLAG_FREE_FALLING)
+		return false; // Freeee falling.
+
+	if (m_UnderwaterState) // We're swimming.
+		return false;
+
+	return true;
 }

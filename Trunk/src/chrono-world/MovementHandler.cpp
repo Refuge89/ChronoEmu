@@ -412,104 +412,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		}
 	}
 
-	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) /*&& !sEventMgr.HasEvents(_player, EVENT_PLAYER_KICK)*/ && !_player->m_CurrentTransporter && !m_isFalling)
+	if (!(HasGMPermissions() && sWorld.no_antihack_on_gm) /*&& !sEventMgr.HasEvents(_player, EVENT_PLAYER_KICK)*/ && !_player->m_CurrentTransporter && !m_isFalling)
 	{
-		/* declarations  */
-
-		bool haxor = false;
-		float real_delta = (_player->GetPositionX() - movement_info.x) * (_player->GetPositionX() - movement_info.x) + (_player->GetPositionY() - movement_info.y) * (_player->GetPositionY() - movement_info.y);
-		float last_player_speed = _player->m_last_move_Speed;
-			
-		float time_delta = movement_info.time - _player->m_lastMoveTime;
-		float allowed_delta = (time_delta < 1500) ? time_delta/1000 : 1.5f;
-
-		/* getting right speed */
-
-		float player_speed = ( _player->flying_aura ) ? _player->m_flySpeed : _player->m_runSpeed;
-		if( _player->flying_aura ) //is this really needed
-		{
-			if( _player->m_runSpeed > _player->m_flySpeed )
-				player_speed = _player->m_runSpeed;
-		}
-
-		if( _player->m_swimSpeed > player_speed )
-			player_speed = _player->m_swimSpeed;
-
-		/* update for next packet */
-
-		_player->m_last_move_Speed = player_speed;
-
-		/* if use last speed if it was higher then our currect speed */
-
-		if(last_player_speed > player_speed)
-			player_speed = last_player_speed;
-
-		/* check if we're not speedhacking */
-		
-		allowed_delta = ((player_speed * time_delta) * (player_speed * time_delta) + World::m_speedHackLatencyMultiplier);
-
-        if (real_delta > allowed_delta)
-			haxor = true;
-			
-		if((movement_info.flags & MOVEFLAG_FALLING || movement_info.flags & MOVEFLAG_FALLING_FAR 
-			|| movement_info.flags & MOVEFLAG_FREE_FALLING)) // no checks here... =(
-				haxor = false;
-		
-		if(haxor)
-		{
-            // DETECTED!!!!
-			_player->BroadcastMessage( "Speed Hack detected. You will be disconnected in 10 seconds." );
-			_player->SetMovement( MOVE_ROOT, 1 );
-			sEventMgr.AddEvent( _player, &Player::_Disconnect, EVENT_PLAYER_KICK, 10000, 1, 0 );
-			return;
-        }
-	}
-
-	_player->m_lastMoveTime = movement_info.time;
-
-	//Water walk hack
-	if (movement_info.flags & MOVEFLAG_WATER_WALK && !_player->m_isWaterWalking
-		&& !(HasGMPermissions() && sWorld.no_antihack_on_gm)) // allow gms to water walk hack (.cheat waterwalk :P)
-	{
-		// No need to dc anyone here, just unset water walk and we're done
-		WorldPacket data( SMSG_MOVE_LAND_WALK, 12 );
-		data.SetOpcode( SMSG_MOVE_LAND_WALK );
-		data << _player->GetNewGUID();
-		data << uint32( 4 );
-		_player->GetSession()->SendPacket(&data);
-	}
-	// Flyhack check (#2) - doesn't require collision 8)
-	if(movement_info.flags & 0x2000000 && !(HasGMPermissions() && sWorld.no_antihack_on_gm)) 
-	{
-		bool haxor = false;
-		// This logic is easy, if we send MOVEFLAG_AIR_FLYING but don't have any flying auras -> gtfo!
-		if(!_player->flying_aura)
-			haxor = true;
-		
-		if((_player->GetShapeShift() == FORM_FLIGHT || _player->GetShapeShift() == FORM_SWIFT) // no droods flying in azeroth plox :X
-		&& _player->GetMapId() != 530 && _player->GetMapId() != 571 )
-			_player->RemoveShapeShiftSpell(_player->m_ShapeShifted);
-
-			
-		if(haxor == true && (movement_info.flags & MOVEFLAG_FALLING || movement_info.flags & MOVEFLAG_FALLING_FAR 
-			|| movement_info.flags & MOVEFLAG_FREE_FALLING))
-			haxor = false;
-			
-		if(_player->m_UnderwaterState && haxor) // We're swimming.
-			haxor = false;
-		
-		if(haxor)
-		{
-			if(!sEventMgr.HasEvent(_player, EVENT_PLAYER_KICK))
-			{
-				sCheatLog.writefromsession(this, "Used Flyhack, detected by Dvlpr's anti-flyhack (#2) - Disconnecting");
-				_player->BroadcastMessage( "Fly Hack detected. You attempted to fly without flying aura on." );
-				_player->BroadcastMessage( "You will be disconnected in 5 seconds." );
-			}
-			_player->SetMovement( MOVE_ROOT, 1 );
-			sEventMgr.AddEvent( _player, &Player::_Disconnect, EVENT_PLAYER_KICK, 5000, 1, 0 );
-			return;
-		}
+		_player->_SpeedhackCheck();
+		_player->_FlyhackCheck();
 	}
 	
 	/************************************************************************/
