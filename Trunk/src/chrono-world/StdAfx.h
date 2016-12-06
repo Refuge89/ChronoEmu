@@ -73,6 +73,16 @@
 #include "../chrono-shared/chrono_getopt.h"
 #include "../chrono-shared/BufferPool.h"
 
+// Warden System
+#include "../chrono-shared/MersenneTwister.h"
+#include "../chrono-shared/Auth/SARC4.h"
+#include "../chrono-shared/Auth/HMACSHA1.h"
+#include "../chrono-shared/Auth/WardenKeyGeneration.h"
+#include "Warden/WardenBase.h"
+#include "Warden/WardenDataStorage.h"
+#include "Warden/WardenMac.h"
+#include "Warden/WardenWin.h"
+
 #include "Const.h"
 #include "UpdateFields.h"
 #include "UpdateMask.h"
@@ -103,6 +113,7 @@
 #include "AlteracValley.h"
 #include "ArathiBasin.h"
 #include "CellHandler.h"
+#include "SpellSystem\ClassFixes.h"
 #include "Chat.h"
 #include "Corpse.h"
 #include "Quest.h"

@@ -161,16 +161,45 @@ uint32 BigNumber::AsDword()
 	return (uint32)BN_get_word(_bn);
 }
 
-uint8 *BigNumber::AsByteArray()
+uint8* BigNumber::AsByteArray(int minSize)
 {
-	if (_array) {
+	int length = (minSize >= GetNumBytes()) ? minSize : GetNumBytes();
+
+	delete[] _array;
+	_array = new uint8[length];
+
+	// If we need more bytes than length of BigNumber set the rest to 0
+	if (length > GetNumBytes())
+	{
+		memset((void*)_array, 0, length);
+	}
+
+	BN_bn2bin(_bn, (unsigned char*)_array);
+
+	std::reverse(_array, _array + length);
+
+	return _array;
+}
+
+uint8 *BigNumber::AsByteArray(int minSize, bool reverse)
+{
+	int length = (minSize >= GetNumBytes()) ? minSize : GetNumBytes();
+
+	if (_array)
+	{
 		delete[] _array;
 		_array = NULL;
 	}
-	_array = new uint8[GetNumBytes()];
+	_array = new uint8[length];
+
+	// If we need more bytes than length of BigNumber set the rest to 0
+	if (length > GetNumBytes())
+		memset((void*)_array, 0, length);
+
 	BN_bn2bin(_bn, (unsigned char *)_array);
 
-	std::reverse(_array, _array + GetNumBytes());
+	if (reverse)
+		std::reverse(_array, _array + length);
 
 	return _array;
 }

@@ -369,6 +369,10 @@
     <ClCompile Include="..\..\src\chrono-world\TradeHandler.cpp" />
     <ClCompile Include="..\..\src\chrono-world\TransporterHandler.cpp" />
     <ClCompile Include="..\..\src\chrono-world\Unit.cpp" />
+    <ClCompile Include="..\..\src\chrono-world\Warden\WardenBase.cpp" />
+    <ClCompile Include="..\..\src\chrono-world\Warden\WardenDataStorage.cpp" />
+    <ClCompile Include="..\..\src\chrono-world\Warden\WardenMac.cpp" />
+    <ClCompile Include="..\..\src\chrono-world\Warden\WardenWin.cpp" />
     <ClCompile Include="..\..\src\chrono-world\WarsongGulch.cpp" />
     <ClCompile Include="..\..\src\chrono-world\WayPoints.cpp" />
     <ClCompile Include="..\..\src\chrono-world\WeatherMgr.cpp" />
@@ -458,6 +462,12 @@
     <ClInclude Include="..\..\src\chrono-world\Unit.h" />
     <ClInclude Include="..\..\src\chrono-world\UpdateFields.h" />
     <ClInclude Include="..\..\src\chrono-world\UpdateMask.h" />
+    <ClInclude Include="..\..\src\chrono-world\Warden\WardenBase.h" />
+    <ClInclude Include="..\..\src\chrono-world\Warden\WardenDataStorage.h" />
+    <ClInclude Include="..\..\src\chrono-world\Warden\WardenMac.h" />
+    <ClInclude Include="..\..\src\chrono-world\Warden\WardenModuleMac.h" />
+    <ClInclude Include="..\..\src\chrono-world\Warden\WardenModuleWin.h" />
+    <ClInclude Include="..\..\src\chrono-world\Warden\WardenWin.h" />
     <ClInclude Include="..\..\src\chrono-world\WarsongGulch.h" />
     <ClInclude Include="..\..\src\chrono-world\WeatherMgr.h" />
     <ClInclude Include="..\..\src\chrono-world\WordFilter.h" />

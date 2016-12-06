@@ -1341,6 +1341,11 @@ void World::Rehash(bool load)
 	antihack_cheatengine = Config.MainConfig.GetBoolDefault("AntiHack", "CheatEngine", false);
 	m_CEThreshold = Config.MainConfig.GetIntDefault("AntiHack", "CheatEngineTimeDiff", 10000);
 	m_wallhackthreshold = Config.MainConfig.GetFloatDefault("AntiHack", "WallHackThreshold", 5.0f);
+
+	// Warden Configuration
+	m_WardenEnabled = Config.MainConfig.GetBoolDefault("Warden", "Warden.Kick", false);
+	
+
 	// ======================================
 
 	if( m_banTable != NULL )

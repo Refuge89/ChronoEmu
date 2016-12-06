@@ -528,6 +528,9 @@ public:
 	bool antihack_cheatengine;
 	bool no_antihack_on_gm;
 
+	// Warden Config
+	bool m_WardenEnabled;
+
 	bool free_arena_teams;
 
 	void CharacterEnumProc(QueryResultVector& results, uint32 AccountId);

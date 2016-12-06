@@ -229,7 +229,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\chrono-shared\Auth\BigNumber.cpp" />
+    <ClCompile Include="..\..\src\chrono-shared\Auth\HMACSHA1.cpp" />
     <ClCompile Include="..\..\src\chrono-shared\Auth\MD5.cpp" />
+    <ClCompile Include="..\..\src\chrono-shared\Auth\SARC4.cpp" />
     <ClCompile Include="..\..\src\chrono-shared\Auth\Sha1.cpp" />
     <ClCompile Include="..\..\src\chrono-shared\Auth\WowCrypt.cpp" />
     <ClCompile Include="..\..\src\chrono-shared\BufferPool.cpp" />
@@ -283,8 +285,11 @@
     <ClInclude Include="..\..\src\chrono-shared\AuthCodes.h" />
     <ClInclude Include="..\..\src\chrono-shared\Auth\AuthPacketKey.h" />
     <ClInclude Include="..\..\src\chrono-shared\Auth\BigNumber.h" />
+    <ClInclude Include="..\..\src\chrono-shared\Auth\HMACSHA1.h" />
     <ClInclude Include="..\..\src\chrono-shared\Auth\MD5.h" />
+    <ClInclude Include="..\..\src\chrono-shared\Auth\SARC4.h" />
     <ClInclude Include="..\..\src\chrono-shared\Auth\Sha1.h" />
+    <ClInclude Include="..\..\src\chrono-shared\Auth\WardenKeyGeneration.h" />
     <ClInclude Include="..\..\src\chrono-shared\Auth\WowCrypt.h" />
     <ClInclude Include="..\..\src\chrono-shared\BufferPool.h" />
     <ClInclude Include="..\..\src\chrono-shared\ByteBuffer.h" />

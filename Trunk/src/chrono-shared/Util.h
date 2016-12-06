@@ -27,6 +27,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 std::vector<std::string> StrSplit(const std::string &src, const std::string &sep);
 
+int32 irand(int32 min, int32 max);
+
 // This HAS to be called outside the threads __try / __except block!
 void SetThreadName(const char* format, ...);
 time_t convTimePeriod ( uint32 dLength, char dType);

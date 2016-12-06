@@ -977,4 +977,9 @@ void WorldSession::Handle38C(WorldPacket & recv_data)
 	data << "01/01/01";
 	SendPacket(&data);
 }
-
+void WorldSession::InitWarden(BigNumber *K)
+{
+    // TODO: check client's os and create proper warden class
+	m_Warden = (WardenBase*)new WardenWin();
+	m_Warden->Init(this, K);
+}

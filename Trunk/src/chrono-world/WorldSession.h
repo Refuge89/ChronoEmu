@@ -161,6 +161,9 @@ public:
 	WorldSession(uint32 id, string Name, WorldSocket *sock);
 	~WorldSession();
 
+	// Warden System
+	WardenBase * m_Warden;
+
 	Player * m_loggingInPlayer;
 	CHRONO_INLINE void SendPacket(WorldPacket* packet)
 	{
@@ -193,6 +196,9 @@ public:
 	/* Acct flags */
 	void SetAccountFlags(uint32 flags) { _accountFlags = flags; }
 	bool HasFlag(uint32 flag) { return (_accountFlags & flag) != 0; }
+
+	// Warden System
+	void InitWarden(BigNumber *K);
 
 	/* GM Permission System */
 	void LoadSecurity(std::string securitystring);
@@ -360,6 +366,7 @@ protected:
 	void HandleMoveNotActiveMoverOpcode( WorldPacket & recv_data );
 	void HandleSetActiveMoverOpcode( WorldPacket & recv_data );
 	void HandleMoveTeleportAckOpcode( WorldPacket & recv_data );
+	void HandleWardenDataOpcode(WorldPacket& recv_data);
 
 	/// Opcodes implemented in GroupHandler.cpp:
 	void HandleGroupInviteOpcode(WorldPacket& recvPacket);
