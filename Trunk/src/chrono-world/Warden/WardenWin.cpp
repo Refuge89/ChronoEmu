@@ -145,7 +145,7 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
         sLog.outString("Request hash reply: failed");
 
 		if (sWorld.m_WardenEnabled)
-            Client->Disconnect()();
+            Client->Disconnect();
         return;
     }
 
@@ -468,5 +468,5 @@ void WardenWin::HandleData(ByteBuffer &buff)
     }
 
     if (found && sWorld.m_WardenEnabled)
-        Client->Disonnect();
+        Client->Disconnect();
 }
