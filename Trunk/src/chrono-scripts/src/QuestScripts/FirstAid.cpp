@@ -113,7 +113,7 @@ bool Triage(uint32 i, Spell * pSpell)
 {
 	// Unit* target = pSpell->GetUnitTarget();
 	// if(!pSpell->p_caster || !target || target->GetTypeId() != TYPEID_UNIT) return true;
-	if(!pSpell->p_caster || pSpell->GetUnitTarget() == NULL) return true;
+	if(!pSpell->p_caster || pSpell->GetUnitTarget() == nullptr) return true;
 		pSpell->p_caster->CastSpell(pSpell->GetUnitTarget(), dbcSpell.LookupEntry(746), true);
 		QuestLogEntry *en = pSpell->p_caster->GetQuestLogForEntry(6624);
 

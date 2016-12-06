@@ -412,7 +412,7 @@ public:
 	CHRONO_INLINE GuildRank * GetGuildRank(uint32 Id)
 	{ 
 		if(Id >= MAX_GUILD_RANKS)
-			return NULL;
+			return nullptr;
 
 		return m_ranks[Id];
 	}
@@ -425,7 +425,7 @@ public:
 		GuildMember * ret;
 		m_lock.Acquire();
 		itr = m_members.find(pInfo);
-		ret = (itr!=m_members.end()) ? itr->second : NULL;
+		ret = (itr!=m_members.end()) ? itr->second : nullptr;
 		m_lock.Release();
 		return ret;
 	}

@@ -72,7 +72,7 @@ T* RandomChoiceVector( vector<pair<T*, float> > & variant )
 	typename vector<pair<T*,float> >::iterator itr;
 
 	if(variant.size() == 0)
-		return NULL;
+		return nullptr;
 
 	for(itr = variant.begin(); itr != variant.end(); ++itr)
 		totalChance += itr->second;
@@ -122,11 +122,11 @@ RandomProps * LootMgr::GetRandomProperties(ItemPrototype * proto)
 	map<uint32,RandomPropertyVector>::iterator itr;
 
 	if(proto->RandomPropId==0)
-		return NULL;
+		return nullptr;
 
     itr = _randomprops.find(proto->RandomPropId);
 	if(itr==_randomprops.end())
-		return NULL;
+		return nullptr;
 
 	return RandomChoiceVector<RandomProps>(itr->second);
 }
@@ -148,7 +148,7 @@ void LootMgr::LoadLootProp()
 			ch = result->Fetch()[2].GetFloat();
 
 			rp = dbcRandomProps.LookupEntryForced(eid);
-			if(rp == NULL)
+			if(rp == nullptr)
 			{
 				Log.Error("LoadLootProp", "RandomProp group %u references non-existant randomprop %u.", id, eid);
 				continue;
@@ -277,7 +277,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 				proto=ItemPrototypeStorage.LookupEntry(itemid);
 				if(!proto)
 				{
-					list.items[ind].item.itemproto=NULL;
+					list.items[ind].item.itemproto=nullptr;
 					if(Config.MainConfig.GetBoolDefault("Server", "CleanDatabase", false))
 					{
 						WorldDatabase.Query("DELETE FROM %s where entryid ='%u' AND itemid = '%u'",szTableName, entry_id, itemid);
@@ -377,7 +377,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic, bool disenc
 				__LootItem itm;
 				itm.item =list->items[x].item;
 				itm.iItemsCount = count;
-				itm.roll = NULL;
+				itm.roll = nullptr;
 				itm.passed = false;
 				itm.ffa_loot = list->items[x].ffa_loot;
 				itm.has_looted.clear();
@@ -389,7 +389,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic, bool disenc
 				else
 				{
 					// save some calls :P
-					itm.iRandomProperty = NULL;
+					itm.iRandomProperty = nullptr;
 				}
 
 				loot->items.push_back(itm);
@@ -564,7 +564,7 @@ void LootMgr::AddLoot(Loot * loot, uint32 itemid, uint32 mincount, uint32 maxcou
 		__LootItem itm;
 		itm.item = item;
 		itm.iItemsCount = count;
-		itm.roll = NULL;
+		itm.roll = nullptr;
 		itm.passed = false;
 		itm.ffa_loot = ffa_loot;
 		itm.has_looted.clear();
@@ -576,7 +576,7 @@ void LootMgr::AddLoot(Loot * loot, uint32 itemid, uint32 mincount, uint32 maxcou
 		else
 		{
 			// save some calls :P
-			itm.iRandomProperty = NULL;
+			itm.iRandomProperty = nullptr;
 		}
 
 		loot->items.push_back(itm);
@@ -619,7 +619,7 @@ void LootRoll::Finalize()
 	WorldPacket data(34);
 
 /*
-	Player * gplr = NULL;
+	Player * gplr = nullptr;
 	for(std::map<uint64, uint32>::iterator itr = NeedRolls.begin(); itr != NeedRolls.end(); ++itr)
 	{
 		gplr = _mgr->GetPlayer((uint32)itr->first);
@@ -699,7 +699,7 @@ void LootRoll::Finalize()
 		return;
 	}
 
-	pLoot->items.at(_slotid).roll = NULL;
+	pLoot->items.at(_slotid).roll = nullptr;
 
 	uint32 itemid = pLoot->items.at(_slotid).item.itemproto->ItemId;
 	uint32 amt = pLoot->items.at(_slotid).iItemsCount;
@@ -716,10 +716,10 @@ void LootRoll::Finalize()
 		data.Initialize(SMSG_LOOT_ALL_PASSED);
 		data << _guid << _groupcount << _itemid << _itemunk1 << _itemunk2;
 		set<uint32>::iterator pitr = m_passRolls.begin();
-		while(_player == NULL && pitr != m_passRolls.end())
+		while(_player == nullptr && pitr != m_passRolls.end())
 			_player = _mgr->GetPlayer( (*(pitr++)) );
 
-		if( _player != NULL )
+		if( _player != nullptr )
 		{
 			if(_player->InGroup())
 				_player->GetGroup()->SendPacketToAll(&data);
@@ -747,7 +747,7 @@ void LootRoll::Finalize()
 	int8 error;
 	if((error = _player->GetItemInterface()->CanReceiveItem(it, 1)))
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
+		_player->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, error);
 		return;
 	}
 
@@ -758,7 +758,7 @@ void LootRoll::Finalize()
 		SlotResult slotresult = _player->GetItemInterface()->FindFreeInventorySlot(it);
 		if(!slotresult.Result)
 		{
-			_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
+			_player->GetItemInterface()->BuildInventoryChangeError(nullptr, nullptr, INV_ERR_INVENTORY_FULL);
 			return;
 		}
 
@@ -766,7 +766,7 @@ void LootRoll::Finalize()
 		Item *item = objmgr.CreateItem( itemid, _player);
 
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
-		if(pLoot->items.at(_slotid).iRandomProperty!=NULL)
+		if(pLoot->items.at(_slotid).iRandomProperty!=nullptr)
 		{
 			item->SetRandomProperty(pLoot->items.at(_slotid).iRandomProperty->ID);
 			item->ApplyRandomProperties(false);
@@ -871,7 +871,7 @@ void LootMgr::FillObjectLootMap(map<uint32, vector<uint32> > *dest)
 {
 	printf("Generating object loot map...\n");
 	QueryResult *result = WorldDatabase.Query("SELECT entryid, itemid FROM objectloot");
-	if( result != NULL )
+	if( result != nullptr )
 	{
 		do 
 		{

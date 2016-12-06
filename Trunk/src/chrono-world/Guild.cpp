@@ -25,8 +25,8 @@ Guild::Guild()
 	m_guildId=0;
 	m_guildLeader=0;
 	m_guildName=(char*)"Goose";
-	m_guildInfo=NULL;
-	m_motd=NULL;
+	m_guildInfo=nullptr;
+	m_motd=nullptr;
 	m_backgroundColor=0;
 	m_emblemColor=0;
 	m_emblemStyle=0;
@@ -51,7 +51,7 @@ Guild::~Guild()
 
 	for(uint32 i = 0; i < MAX_GUILD_RANKS; ++i)
 	{
-		if(m_ranks[i] != NULL)
+		if(m_ranks[i] != nullptr)
 		{
 			free(m_ranks[i]->szRankName);
 			delete m_ranks[i];
@@ -77,22 +77,22 @@ GuildRank * Guild::FindLowestRank()
 {
 	for(uint32 i = MAX_GUILD_RANKS-1; i > 0; --i)
 	{
-		if(m_ranks[i] != NULL)
+		if(m_ranks[i] != nullptr)
 			return m_ranks[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 GuildRank * Guild::FindHighestRank()
 {
 	for(uint32 i = 1; i < MAX_GUILD_RANKS; ++i)
 	{
-		if(m_ranks[i] != NULL)
+		if(m_ranks[i] != nullptr)
 			return m_ranks[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool GuildRank::CanPerformCommand(uint32 t)
@@ -106,7 +106,7 @@ void Guild::LogGuildEvent(uint8 iEvent, uint8 iStringCount, ...)
 		return;
 
 	va_list ap;
-	char * strs[4] = {NULL,NULL,NULL,NULL};
+	char * strs[4] = {nullptr,nullptr,nullptr,nullptr};
 
 	va_start(ap, iStringCount);
 	ASSERT(iStringCount <= 4);
@@ -171,7 +171,7 @@ void Guild::SendPacket(WorldPacket * data)
 	m_lock.Acquire();
 	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
 	{
-		if(itr->first->m_loggedInPlayer != NULL && itr->first->m_loggedInPlayer->GetSession())
+		if(itr->first->m_loggedInPlayer != nullptr && itr->first->m_loggedInPlayer->GetSession())
 			itr->first->m_loggedInPlayer->GetSession()->SendPacket(data);
 	}
 	m_lock.Release();
@@ -184,7 +184,7 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 	m_lock.Acquire();
 	for(i = 0; i < MAX_GUILD_RANKS; ++i)
 	{
-		if(m_ranks[i] == NULL)
+		if(m_ranks[i] == nullptr)
 		{
 			GuildRank * r = new GuildRank;
 			memset(r, 0, sizeof(GuildRank));
@@ -204,7 +204,7 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 		}
 	}
 	m_lock.Release();
-	return NULL;
+	return nullptr;
 }
 
 // creating from a charter
@@ -232,14 +232,14 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	m_commandLogging = false;
 
 	// add the leader to the guild
-	AddGuildMember(pTurnIn->GetPlayer()->m_playerInfo, NULL, leaderRank->iId);
+	AddGuildMember(pTurnIn->GetPlayer()->m_playerInfo, nullptr, leaderRank->iId);
 
 	// add all the other people
 	for(i = 0; i < pCharter->SignatureCount; ++i)
 	{
 		PlayerInfo * pi = objmgr.GetPlayerInfo(pCharter->Signatures[i]);
 		if(pi)
-			AddGuildMember(pi, NULL, defRank->iId);
+			AddGuildMember(pi, nullptr, defRank->iId);
 	}
 
 	// re-enable command logging
@@ -268,16 +268,16 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	// find the lowest rank that isnt his rank
 	int32 nh = pMember->guildRank->iId - 1;
-	GuildRank * newRank = NULL;
+	GuildRank * newRank = nullptr;
 
 	m_lock.Acquire();
-	while(nh > 0 && newRank == NULL)
+	while(nh > 0 && newRank == nullptr)
 	{
 		newRank = m_ranks[nh];
 		nh--;
 	}
 
-	if(newRank==NULL)
+	if(newRank==nullptr)
 	{
 		m_lock.Release();
 		pClient->SystemMessage("Could not find a rank to promote this member to.");
@@ -324,16 +324,16 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	// find the next highest rank
 	uint32 nh = pMember->guildRank->iId + 1;
-	GuildRank * newRank = NULL;
+	GuildRank * newRank = nullptr;
 
 	m_lock.Acquire();
-	while(nh < 10 && newRank == NULL)
+	while(nh < 10 && newRank == nullptr)
 	{
 		newRank = m_ranks[nh];
 		++nh;
 	}
 
-	if(newRank==NULL)
+	if(newRank==nullptr)
 	{
 		m_lock.Release();
 		pClient->SystemMessage("Could not find a rank to demote this member to.");
@@ -376,12 +376,12 @@ bool Guild::LoadFromDB(Field * f)
 	m_borderStyle = f[5].GetUInt32();
 	m_borderColor = f[6].GetUInt32();
 	m_backgroundColor = f[7].GetUInt32();
-	m_guildInfo = strlen(f[8].GetString()) ? strdup(f[8].GetString()) : NULL;
-	m_motd = strlen(f[9].GetString()) ? strdup(f[9].GetString()) : NULL;
+	m_guildInfo = strlen(f[8].GetString()) ? strdup(f[8].GetString()) : nullptr;
+	m_motd = strlen(f[9].GetString()) ? strdup(f[9].GetString()) : nullptr;
 	m_creationTimeStamp = f[10].GetUInt32();
 
 	QueryResult * result = CharacterDatabase.Query("SELECT * FROM guild_ranks WHERE guildId = %u ORDER BY rankId ASC", m_guildId);
-	if(result==NULL)
+	if(result==nullptr)
 		return false;
 
 	uint32 sid = 0;
@@ -404,7 +404,7 @@ bool Guild::LoadFromDB(Field * f)
 		r->iRights = f2[3].GetUInt32();
 
 		//m_ranks.push_back(r);
-		ASSERT(m_ranks[r->iId] == NULL);
+		ASSERT(m_ranks[r->iId] == nullptr);
 		m_ranks[r->iId] = r;
 
 	} while(result->NextRow());
@@ -412,7 +412,7 @@ bool Guild::LoadFromDB(Field * f)
 
 	// load members
 	result = CharacterDatabase.Query("SELECT * FROM guild_data WHERE guildid = %u", m_guildId);
-	if(result==NULL)
+	if(result==nullptr)
 		return false;
 
 	do 
@@ -420,20 +420,20 @@ bool Guild::LoadFromDB(Field * f)
 		Field * f3 = result->Fetch();
 		GuildMember * gm = new GuildMember;
 		gm->pPlayer = objmgr.GetPlayerInfo(f3[1].GetUInt32());
-		if(gm->pPlayer == NULL)
+		if(gm->pPlayer == nullptr)
 		{
 			delete gm;
 			continue;
 		}
 
-		if(f3[2].GetUInt32() >= MAX_GUILD_RANKS || m_ranks[f3[2].GetUInt32()] == NULL) 
+		if(f3[2].GetUInt32() >= MAX_GUILD_RANKS || m_ranks[f3[2].GetUInt32()] == nullptr) 
 		{
 			delete gm;
 			continue;
 		}
 
 		gm->pRank = m_ranks[f3[2].GetUInt32()];
-		if(gm->pRank==NULL)
+		if(gm->pRank==nullptr)
 			gm->pRank=FindLowestRank();
 		gm->pPlayer->guild=this;
 		gm->pPlayer->guildRank=gm->pRank;
@@ -442,12 +442,12 @@ bool Guild::LoadFromDB(Field * f)
 		if(strlen(f3[3].GetString()))
 			gm->szPublicNote = strdup(f3[3].GetString());
 		else
-			gm->szPublicNote = NULL;
+			gm->szPublicNote = nullptr;
 
 		if(strlen(f3[4].GetString()))
 			gm->szOfficerNote = strdup(f3[4].GetString());
 		else
-			gm->szOfficerNote = NULL;
+			gm->szOfficerNote = nullptr;
 
 		m_members.insert(make_pair(gm->pPlayer, gm));
 
@@ -479,7 +479,7 @@ void Guild::SetMOTD(const char * szNewMotd, WorldSession * pClient)
 	}
 	else
 	{
-		m_motd= NULL;
+		m_motd= nullptr;
 		CharacterDatabase.Execute("UPDATE guilds SET motd = \"\" WHERE guildId = %u", m_guildId);
 	}
 
@@ -507,7 +507,7 @@ void Guild::SetGuildInformation(const char * szGuildInformation, WorldSession * 
 	}
 	else
 	{
-		m_guildInfo= NULL;
+		m_guildInfo= nullptr;
 		CharacterDatabase.Execute("UPDATE guilds SET guildInfo = \"\" WHERE guildId = %u", m_guildId);
 	}
 }
@@ -515,7 +515,7 @@ void Guild::SetGuildInformation(const char * szGuildInformation, WorldSession * 
 // adding a member
 void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 ForcedRank /* = -1 */)
 {
-	if(pMember->guild != NULL)
+	if(pMember->guild != nullptr)
 		return;
 
 	if(pClient && pClient->GetPlayer()->m_playerInfo->guild != this)
@@ -531,10 +531,10 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 	else
 		r = (ForcedRank<0) ? FindLowestRank() : m_ranks[ForcedRank];
 
-	if(r==NULL)
+	if(r==nullptr)
 		r=FindLowestRank();
 
-	if(r==NULL)
+	if(r==nullptr)
 	{
 		// shouldnt happen
 		m_lock.Release();
@@ -545,7 +545,7 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 	memset(pm, 0, sizeof(GuildMember));
 	pm->pPlayer = pMember;
 	pm->pRank = r;
-	pm->szOfficerNote = pm->szPublicNote = NULL;
+	pm->szOfficerNote = pm->szPublicNote = nullptr;
 	m_members.insert(make_pair(pMember, pm));
 
 	pMember->guild=this;
@@ -614,9 +614,9 @@ void Guild::RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	m_lock.Release();
 
-	pMember->guildRank=NULL;
-	pMember->guild=NULL;
-	pMember->guildMember=NULL;
+	pMember->guildRank=nullptr;
+	pMember->guild=nullptr;
+	pMember->guildMember=nullptr;
 
 	if(pMember->m_loggedInPlayer)
 	{
@@ -649,10 +649,10 @@ void Guild::SetPublicNote(PlayerInfo * pMember, const char * szNewNote, WorldSes
 		if(szNewNote && szNewNote[0] != '\0')
 			itr->second->szPublicNote = strdup(szNewNote);
 		else
-			itr->second->szPublicNote = NULL;
+			itr->second->szPublicNote = nullptr;
 
 			// Update the database
-		if (itr->second->szPublicNote == NULL) 
+		if (itr->second->szPublicNote == nullptr) 
 			CharacterDatabase.Execute("UPDATE guild_data SET publicNote=\"\" WHERE playerid=%u", pMember->guid);
 		else
 			CharacterDatabase.Execute("UPDATE guild_data SET publicNote=\"%s\" WHERE playerid=%u", 
@@ -689,10 +689,10 @@ void Guild::SetOfficerNote(PlayerInfo * pMember, const char * szNewNote, WorldSe
 		if(szNewNote && szNewNote[0] != '\0')
 			itr->second->szOfficerNote = strdup(szNewNote);
 		else
-			itr->second->szOfficerNote = NULL;
+			itr->second->szOfficerNote = nullptr;
 
 		// Update the database
-		if (itr->second->szOfficerNote == NULL) 
+		if (itr->second->szOfficerNote == nullptr) 
 			CharacterDatabase.Execute("UPDATE guild_data SET officerNote=\"\" WHERE playerid=%u", pMember->guid);
 		else
 			CharacterDatabase.Execute("UPDATE guild_data SET officerNote=\"%s\" WHERE playerid=%u", 
@@ -710,7 +710,7 @@ void Guild::RemoveGuildRank(WorldSession * pClient)
 	m_lock.Acquire();
 
 	GuildRank * pLowestRank = FindLowestRank();
-	if(pLowestRank == NULL || pLowestRank->iId < 5)		// cannot delete default ranks.
+	if(pLowestRank == nullptr || pLowestRank->iId < 5)		// cannot delete default ranks.
 	{
 		pClient->SystemMessage("Cannot find a rank to delete.");
 		m_lock.Release();
@@ -730,7 +730,7 @@ void Guild::RemoveGuildRank(WorldSession * pClient)
 	}
 
 	CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u AND rankId = %u", m_guildId, pLowestRank->iId);
-	m_ranks[pLowestRank->iId] = NULL;
+	m_ranks[pLowestRank->iId] = nullptr;
 	delete pLowestRank;
 	m_lock.Release();
 }
@@ -740,10 +740,10 @@ void Guild::Disband()
 	m_lock.Acquire();
 	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
 	{
-		itr->first->guild=NULL;
-		itr->first->guildRank=NULL;
-		itr->first->guildMember=NULL;
-		if(itr->first->m_loggedInPlayer != NULL)
+		itr->first->guild=nullptr;
+		itr->first->guildRank=nullptr;
+		itr->first->guildMember=nullptr;
+		if(itr->first->m_loggedInPlayer != nullptr)
 		{
 			itr->first->m_loggedInPlayer->SetGuildId(0);
 			itr->first->m_loggedInPlayer->SetGuildRank(0);
@@ -771,7 +771,7 @@ void Guild::ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient)
 
 	m_lock.Acquire();
 	GuildRank * newRank = FindHighestRank();
-	if(newRank==NULL)
+	if(newRank==nullptr)
 	{
 		m_lock.Release();
 		return;
@@ -779,7 +779,7 @@ void Guild::ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient)
 
 	GuildMemberMap::iterator itr = m_members.find(pNewMaster);
 	GuildMemberMap::iterator itr2 = m_members.find(pClient->GetPlayer()->m_playerInfo);
-	ASSERT(m_ranks[0]!=NULL);
+	ASSERT(m_ranks[0]!=nullptr);
 	if(itr==m_members.end() || itr2==m_members.end())
 	{
 		m_lock.Release();
@@ -900,7 +900,7 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 
 		data << itr->first->guid;
 		data << uint32(0);			// highguid
-		data << uint8( (pPlayer!=NULL) ? 1 : 0 );
+		data << uint8( (pPlayer!=nullptr) ? 1 : 0 );
 		data << itr->first->name;
 		data << itr->second->pRank->iId;
 		data << uint8(itr->first->lastLevel);
@@ -915,7 +915,7 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 		else
 			data << uint8(0);
 
-		if(ofnote && itr->second->szOfficerNote != NULL)
+		if(ofnote && itr->second->szOfficerNote != nullptr)
 			data << itr->second->szOfficerNote;
 		else
 			data << uint8(0);
@@ -939,7 +939,7 @@ void Guild::SendGuildQuery(WorldSession * pClient)
 	for(i = 0; i < MAX_GUILD_RANKS; ++i)
 	{
 		r = m_ranks[i];
-		if(r != NULL)
+		if(r != nullptr)
 			data << r->szRankName;
 		else
 			data << uint8(0);
@@ -951,7 +951,7 @@ void Guild::SendGuildQuery(WorldSession * pClient)
 	data << m_borderColor;
 	data << m_backgroundColor;
 
-	if(pClient != NULL)
+	if(pClient != nullptr)
 	{
 		pClient->SendPacket(&data);
 	}

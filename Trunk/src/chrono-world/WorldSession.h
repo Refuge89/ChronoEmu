@@ -142,7 +142,7 @@ public:
 };
 
 #define CHECK_INWORLD_RETURN if(!_player->IsInWorld()) { return; }
-#define CHECK_GUID_EXISTS(guidx) if(_player->GetMapMgr()->GetUnit((guidx)) == NULL) { return; }
+#define CHECK_GUID_EXISTS(guidx) if(_player->GetMapMgr()->GetUnit((guidx)) == nullptr) { return; }
 #define CHECK_PACKET_SIZE(pckp, ssize) if(ssize && pckp.size() < ssize) { Disconnect(); return; }
 
 #define NOTIFICATION_MESSAGE_NO_PERMISSION "You do not have permission to perform that function."
@@ -180,7 +180,7 @@ public:
 	CHRONO_INLINE void OutPacket(uint16 opcode)
 	{
 		if(_socket && _socket->IsConnected())
-			_socket->OutPacket(opcode, 0, NULL);
+			_socket->OutPacket(opcode, 0, nullptr);
 	}
 
 	void Delete();
@@ -211,7 +211,7 @@ public:
 		if(!permissioncount)
 			return false;
 
-		return (strchr(permissions,'a')!=NULL) ? true : false;
+		return (strchr(permissions,'a')!=nullptr) ? true : false;
 	}
    
 	bool CanUseCommand(char cmdstr);

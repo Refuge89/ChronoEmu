@@ -243,11 +243,11 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 	uint8 SourceSlot = recv_data.contents()[2];
 
 	Player* pTarget = _player->GetTradeTarget();
-	if(pTarget == NULL || !pTarget->IsInWorld() || TradeSlot > 6)
+	if(pTarget == nullptr || !pTarget->IsInWorld() || TradeSlot > 6)
 		return;
 		
 	Item* pItem = _player->GetItemInterface()->GetInventoryItem(SourceBag, SourceSlot);
-	if( pItem == NULL )
+	if( pItem == nullptr )
 		return;
 
 	if(pItem->IsContainer())
@@ -342,8 +342,8 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 			if(pTarget->mTradeItems[Index] != 0)	++TargetItemCount;
 		}
 
-		if( (_player->m_ItemInterface->CalculateFreeSlots(NULL) + ItemCount) < TargetItemCount ||
-			(pTarget->m_ItemInterface->CalculateFreeSlots(NULL) + TargetItemCount) < ItemCount )
+		if( (_player->m_ItemInterface->CalculateFreeSlots(nullptr) + ItemCount) < TargetItemCount ||
+			(pTarget->m_ItemInterface->CalculateFreeSlots(nullptr) + TargetItemCount) < ItemCount )
 		{
 			// Not enough slots on one end.
 			TradeStatus = TRADE_STATUS_CANCELLED;
@@ -362,7 +362,7 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				{
 					if( _player->mTradeItems[Index]->IsSoulbound() )
 					{
-						_player->mTradeItems[Index] = NULL;
+						_player->mTradeItems[Index] = nullptr;
 					}
 					else
 					{
@@ -379,7 +379,7 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				{
 					if( pTarget->mTradeItems[Index]->IsSoulbound() )
 					{
-						pTarget->mTradeItems[Index] = NULL;
+						pTarget->mTradeItems[Index] = nullptr;
 					}
 					else
 					{

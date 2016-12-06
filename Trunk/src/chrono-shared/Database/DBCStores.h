@@ -572,7 +572,7 @@ CHRONO_INLINE uint32 GetDuration(SpellDuration *dur)
     return dur->Duration1;
 }
 
-#define SAFE_DBC_CODE_RETURNS			/* undefine this to make out of range/nulls return null. */
+#define SAFE_DBC_CODE_RETURNS			/* undefine this to make out of range/nulls return nullptr. */
 
 template<class T>
 class SERVER_DECL DBCStorage
@@ -590,13 +590,13 @@ public:
 	
 	DBCStorage()
 	{
-		m_heapBlock = NULL;
-		m_entries = NULL;
-		m_firstEntry = NULL;
+		m_heapBlock = nullptr;
+		m_entries = nullptr;
+		m_firstEntry = nullptr;
 		m_max = 0;
 		m_numrows = 0;
 		m_stringlength=0;
-		m_stringData = NULL;
+		m_stringData = nullptr;
 	}
 
 	~DBCStorage()
@@ -609,17 +609,17 @@ public:
 		if(m_heapBlock)
 		{
 			free(m_heapBlock);
-			m_heapBlock = NULL;
+			m_heapBlock = nullptr;
 		}
 		if(m_entries)
 		{
 			free(m_entries);
-			m_entries = NULL;
+			m_entries = nullptr;
 		}
-		if( m_stringData != NULL )
+		if( m_stringData != nullptr )
 		{
 			free(m_stringData);
-			m_stringData = NULL;
+			m_stringData = nullptr;
 		}
 	}
 
@@ -634,7 +634,7 @@ public:
 		long pos;
 
 		FILE * f = fopen(filename, "rb");
-		if(f == NULL)
+		if(f == nullptr)
 			return false;
 
 		/* read the number of rows, and allocate our block on the heap */
@@ -684,7 +684,7 @@ public:
 			memset(m_entries, 0, (sizeof(T*) * (m_max+1)));
 			for(i = 0; i < rows; ++i)
 			{
-				if(m_firstEntry == NULL)
+				if(m_firstEntry == nullptr)
 					m_firstEntry = &m_heapBlock[i];
 
 				m_entries[*(uint32*)&m_heapBlock[i]] = &m_heapBlock[i];
@@ -759,10 +759,10 @@ public:
 #if 0
 		if(m_entries)
 		{
-			if(i > m_max || m_entries[i] == NULL)
+			if(i > m_max || m_entries[i] == nullptr)
 			{
 				printf("LookupEntryForced failed for entry %u\n", i);
-				return NULL;
+				return nullptr;
 			}
 			else
 				return m_entries[i];
@@ -770,22 +770,22 @@ public:
 		else
 		{
 			if(i >= m_numrows)
-				return NULL;
+				return nullptr;
 			else
 				return &m_heapBlock[i];
 		}
 #else
 		if(m_entries)
 		{
-			if(i > m_max || m_entries[i] == NULL)
-				return NULL;
+			if(i > m_max || m_entries[i] == nullptr)
+				return nullptr;
 			else
 				return m_entries[i];
 		}
 		else
 		{
 			if(i >= m_numrows)
-				return NULL;
+				return nullptr;
 			else
 				return &m_heapBlock[i];
 		}
@@ -803,7 +803,7 @@ public:
 	{
 		if(m_entries)
 		{
-			if(i > m_max || m_entries[i] == NULL)
+			if(i > m_max || m_entries[i] == nullptr)
 				return m_firstEntry;
 			else
 				return m_entries[i];
@@ -831,15 +831,15 @@ public:
 	{
 		if(m_entries)
 		{
-			if(i > m_max || m_entries[i] == NULL)
-				return NULL;
+			if(i > m_max || m_entries[i] == nullptr)
+				return nullptr;
 			else
 				return m_entries[i];
 		}
 		else
 		{
 			if(i >= m_numrows)
-				return NULL;
+				return nullptr;
 			else
 				return m_heapBlock[i];
 		}
@@ -848,7 +848,7 @@ public:
 	T * LookupRow(uint32 i)
 	{
 		if(i >= m_numrows)
-			return NULL;
+			return nullptr;
 		else
 			return m_heapBlock[i];
 	}

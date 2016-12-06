@@ -415,7 +415,7 @@ void InformationCore::SetRealmOffline(uint32 realm_id, LogonCommServerSocket *ss
 			pr->m_charMapLock.Acquire();
 			pr->CharacterMap.clear();
 			pr->m_charMapLock.Release();
-			pr->ServerSocket = NULL;
+			pr->ServerSocket = nullptr;
 		}
 	}
 	realmLock.Release();
@@ -442,7 +442,7 @@ Realm * InformationCore::GetRealmByName(const char * realmName)
 	}
 
 	realmLock.Release();
-	return NULL;
+	return nullptr;
 }
 
 Realm * InformationCore::GetRealmById(uint32 id)
@@ -455,7 +455,7 @@ Realm * InformationCore::GetRealmById(uint32 id)
 		return itr->second;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void InformationCore::SendRealms(AuthSocket * Socket)
@@ -516,7 +516,7 @@ void InformationCore::TimeoutSockets()
 	/* burlex: this is vulnerable to race conditions, adding a mutex to it. */
 	serverSocketLock.Acquire();
 
-	uint32 t = uint32(time(NULL));
+	uint32 t = uint32(time(nullptr));
 	// check the ping time
 	set<LogonCommServerSocket*>::iterator itr, it2;
 	LogonCommServerSocket * s;

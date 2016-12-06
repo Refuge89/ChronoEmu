@@ -381,7 +381,7 @@ Transporter::~Transporter()
 			delete TO_CREATURE( itr->second )->m_transportPosition;
 
 		itr->second->Destructor();
-		itr->second = NULL;
+		itr->second = nullptr;
 	}
 }
 
@@ -448,7 +448,7 @@ void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offse
 
 	CreatureInfo * inf = CreatureNameStorage.LookupEntry(Entry);
 	CreatureProto * proto = CreatureProtoStorage.LookupEntry(Entry);
-	if(inf==NULL||proto==NULL)
+	if(inf==nullptr||proto==nullptr)
 		return;
 
 	Creature * pCreature = new Creature((uint64)HIGHGUID_TYPE_TRANSPORTER<<32 | guid);
@@ -462,11 +462,11 @@ Creature * Transporter::GetCreature(uint32 Guid)
 {
 	TransportNPCMap::iterator itr = m_npcs.find(Guid);
 	if(itr==m_npcs.end())
-		return NULL;
+		return nullptr;
 	if(itr->second->GetTypeId()==TYPEID_UNIT)
 		return TO_CREATURE( itr->second );
 	else
-		return NULL;
+		return nullptr;
 }
 
 uint32 Transporter::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target )

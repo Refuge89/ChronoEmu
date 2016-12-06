@@ -129,7 +129,7 @@ void CThreadPool::Startup()
 	int tcount = THREAD_RESERVE;
 
 	for(i=0; i < tcount; ++i)
-		StartThread(NULL);
+		StartThread(nullptr);
 
 	Log.Debug("ThreadPool", "Startup, launched %u threads.", tcount);
 }
@@ -159,7 +159,7 @@ void CThreadPool::IntegrityCheck()
 		_threadsEaten=0;
 
 		for(uint32 i = 0; i < new_threads; ++i)
-			StartThread(NULL);
+			StartThread(nullptr);
 
 		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled < 0) Spawning %u threads.", new_threads);
 	}
@@ -169,7 +169,7 @@ void CThreadPool::IntegrityCheck()
 		// spawn enough threads to keep the reserve amount up.
 		uint32 new_threads = (THREAD_RESERVE - gobbled);
 		for(uint32 i = 0; i < new_threads; ++i)
-			StartThread(NULL);
+			StartThread(nullptr);
 
 		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled <= 5) Spawning %u threads.", new_threads);
 	}
@@ -192,7 +192,7 @@ void CThreadPool::IntegrityCheck()
 		uint32 j = 5 - m_freeThreads.size();
 		Log.Debug("ThreadPool", "Spawning %u threads.", j);
 		for(uint32 i = 0; i < j; ++i)
-			StartThread(NULL);
+			StartThread(nullptr);
 	}*/
 
 	_threadsExitedSinceLastCheck = 0;
@@ -212,7 +212,7 @@ void CThreadPool::KillFreeThreads(uint32 count)
 	for(i = 0, itr = m_freeThreads.begin(); i < count && itr != m_freeThreads.end(); ++i, ++itr)
 	{
 		t = *itr;
-		t->ExecutionTarget = NULL; 
+		t->ExecutionTarget = nullptr; 
 		t->DeleteAfterExit = true;
 		++_threadsToExit;
 		t->ControlInterface.Resume();
@@ -269,18 +269,18 @@ static unsigned long WINAPI thread_proc(void* param)
 	Thread * t = (Thread*)param;
 	t->SetupMutex.Acquire();
 	uint32 tid = t->ControlInterface.GetId();
-	bool ht = (t->ExecutionTarget != NULL);
+	bool ht = (t->ExecutionTarget != nullptr);
 	t->SetupMutex.Release();
 	//Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
 
 	for(;;)
 	{
-		if(t->ExecutionTarget != NULL)
+		if(t->ExecutionTarget != nullptr)
 		{
 			if( RunThread( t->ExecutionTarget ) )
 				delete t->ExecutionTarget;
 
-			t->ExecutionTarget = NULL;
+			t->ExecutionTarget = nullptr;
 		}
 
 		if(!ThreadPool.ThreadExit(t))
@@ -312,9 +312,9 @@ Thread * CThreadPool::StartThread(ThreadContext * ExecutionTarget)
 	
 	t->DeleteAfterExit = false;
 	t->ExecutionTarget = ExecutionTarget;
-	//h = (HANDLE)_beginthreadex(NULL, 0, &thread_proc, (void*)t, 0, NULL);
+	//h = (HANDLE)_beginthreadex(nullptr, 0, &thread_proc, (void*)t, 0, nullptr);
 	t->SetupMutex.Acquire();
-	h = CreateThread(NULL, 0, &thread_proc, (LPVOID)t, 0, (LPDWORD)&t->ControlInterface.thread_id);
+	h = CreateThread(nullptr, 0, &thread_proc, (LPVOID)t, 0, (LPDWORD)&t->ControlInterface.thread_id);
 	t->ControlInterface.Setup(h);
 	t->SetupMutex.Release();
 
@@ -332,12 +332,12 @@ static void * thread_proc(void * param)
 
 	for(;;)
 	{
-		if(t->ExecutionTarget != NULL)
+		if(t->ExecutionTarget != nullptr)
 		{
 			if(t->ExecutionTarget->run())
 				delete t->ExecutionTarget;
 
-			t->ExecutionTarget = NULL;
+			t->ExecutionTarget = nullptr;
 		}
 
 		if(!ThreadPool.ThreadExit(t))
@@ -351,7 +351,7 @@ static void * thread_proc(void * param)
 	}
 
 	//pthread_exit(0);
-	return NULL;
+	return nullptr;
 }
 
 Thread * CThreadPool::StartThread(ThreadContext * ExecutionTarget)
@@ -364,7 +364,7 @@ Thread * CThreadPool::StartThread(ThreadContext * ExecutionTarget)
 	// lock the main mutex, to make sure id generation doesn't get messed up
 	_mutex.Acquire();
 	t->SetupMutex.Acquire();
-	pthread_create(&target, NULL, &thread_proc, (void*)t);
+	pthread_create(&target, nullptr, &thread_proc, (void*)t);
 	t->ControlInterface.Setup(target);
 	t->SetupMutex.Release();
 	_mutex.Release();

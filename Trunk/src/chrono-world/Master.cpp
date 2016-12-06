@@ -120,13 +120,13 @@ bool Master::Run(int argc, char ** argv)
 	{
 		{ "checkconf",			chrono_no_argument,				&do_check_conf,			1		},
 		{ "version",			chrono_no_argument,				&do_version,			1		},
-		{ "conf",				chrono_required_argument,		NULL,					'c'		},
-		{ "realmconf",			chrono_required_argument,		NULL,					'r'		},
+		{ "conf",				chrono_required_argument,		nullptr,					'c'		},
+		{ "realmconf",			chrono_required_argument,		nullptr,					'r'		},
 		{ 0, 0, 0, 0 }
 	};
 
 	char c;
-	while ((c = chrono_getopt_long_only(argc, argv, ":f:", longopts, NULL)) != -1)
+	while ((c = chrono_getopt_long_only(argc, argv, ":f:", longopts, nullptr)) != -1)
 	{
 		switch (c)
 		{
@@ -149,7 +149,7 @@ bool Master::Run(int argc, char ** argv)
 	}
 
 	// Startup banner
-	UNIXTIME = time(NULL);
+	UNIXTIME = time(nullptr);
 	g_localTime = *localtime(&UNIXTIME);
 
 	printf(BANNER, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
@@ -186,7 +186,7 @@ bool Master::Run(int argc, char ** argv)
     
 #ifndef WIN32
 	if(geteuid() == 0 || getegid() == 0)
-		Log.LargeErrorMessage( LARGERRORMESSAGE_WARNING, "You are running Ascent as root.", "This is not needed, and may be a possible security risk.", "It is advised to hit CTRL+C now and", "start as a non-privileged user.", NULL);
+		Log.LargeErrorMessage( LARGERRORMESSAGE_WARNING, "You are running Ascent as root.", "This is not needed, and may be a possible security risk.", "It is advised to hit CTRL+C now and", "start as a non-privileged user.", nullptr);
 #endif
 
 	InitRandomNumberGenerators();
@@ -358,10 +358,10 @@ bool Master::Run(int argc, char ** argv)
 		}
 
 		/* since time() is an expensive system call, we only update it once per server loop */
-		curTime = time(NULL);
+		curTime = time(nullptr);
 		if( UNIXTIME != curTime )
 		{
-			UNIXTIME = time(NULL);
+			UNIXTIME = time(nullptr);
 			g_localTime = *localtime(&curTime);
 		}
 
@@ -416,11 +416,11 @@ bool Master::Run(int argc, char ** argv)
 
 	Log.Notice( "CharacterLoaderThread", "Exiting..." );
 	ctl->Terminate();
-	ctl = NULL;
+	ctl = nullptr;
 
 	Log.Notice( "DayWatcherThread", "Exiting..." );
 	dw->terminate();
-	dw = NULL;
+	dw = nullptr;
 
 #ifndef CLUSTERING
 	ls->Close();

@@ -181,7 +181,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			}
 
 			Group *pGroup = _player->GetGroup();
-			if(pGroup == NULL) break;
+			if(pGroup == nullptr) break;
 			
 			if(GetPlayer()->m_modlanguage >=0)
 				data=sChatHandler.FillMessageData( type, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
@@ -391,7 +391,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
 			Channel *chn = channelmgr.GetChannel(channel.c_str(),GetPlayer()); 
 			if(chn) 
-				chn->Say(GetPlayer(),msg.c_str(), NULL, false);
+				chn->Say(GetPlayer(),msg.c_str(), nullptr, false);
 
 			//sLog.outString("[%s] %s: %s", channel.c_str(), _player->GetName(), msg.c_str());
 			pMsg=msg.c_str();
