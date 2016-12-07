@@ -32,9 +32,7 @@ void AccountMgr::_ReloadAccounts(bool silent, bool update)
 	Field * field;
 	string AccountName;
 	Account * acct;
-	uint8 changed;
 	bool removed = false;
-	bool load;
 
 	result = sLogonSQL->Query("SELECT acct, login, password, encrypted_password, gm, flags, banned, muted FROM accounts");
 
@@ -465,11 +463,9 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 	// packet header
     ByteBuffer data;
     data << uint32(0);
-
-	//sAuthLogonChallenge_C * client = Socket->GetChallenge();
 	data << uint8(m_realms.size());
 	
-	// loop realms :/
+	// Realm Loops
 	map<uint32, Realm*>::iterator itr = m_realms.begin();
 	for(; itr != m_realms.end(); ++itr)
 	{
@@ -481,13 +477,9 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 		data << itr->second->Address;
 		data << itr->second->Population;
 
-		/* Get our character count */
-		//if( itr->second->Colour != REALMCOLOUR_OFFLINE )
-			//data << itr->second->GetCharacterCount( Socket->GetAccountID() );
-		//else
 		data << uint8(0);
 		data << uint8(itr->second->TimeZone);
-		data << uint8(0);	// Online/Offline?
+		data << uint8(0);	// Online / Offline
 	}
 
 	realmLock.Release();
@@ -504,8 +496,7 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 	*(uint16*)&data.contents()[1] = uint16(data.size() - 3);
 
 	// Send to the socket.
-	//Socket->Send((const uint8*)data.contents(), uint32(data.size()));
-	Socket->SendPacket((uint8*)hdr.contents(), hdr.size());
+	Socket->Send((const uint8*)hdr.contents(), uint32(hdr.size()));
 }
 
 void InformationCore::TimeoutSockets()

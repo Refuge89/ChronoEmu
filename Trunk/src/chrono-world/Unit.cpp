@@ -1755,17 +1755,12 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	if(!pVictim->isAlive() || !isAlive()  || IsStunned() || IsPacified() || IsFeared())
 		return;
 
-	if(!isInFront(pVictim))
-	{
-		if(!ability || !ability->NameHash == SPELL_HASH_WHIRLWIND )
+	if (!isInFront(pVictim))
+		if (IsPlayer())
 		{
-			if(IsPlayer())
-			{
-				TO_PLAYER( this )->GetSession()->OutPacket(SMSG_ATTACKSWING_BADFACING);
-				return;
-			}
+			static_cast< Player* >(this)->GetSession()->OutPacket(SMSG_ATTACKSWING_BADFACING);
+			return;
 		}
-	}
 //==========================================================================================
 //==============================Variables Initialization====================================
 //==========================================================================================
@@ -2429,7 +2424,7 @@ else
 			{
 				// TODO: Separate damage based on school.
 				splittarget = pVictim->GetMapMgr() ? pVictim->GetMapMgr()->GetUnit( itr->m_target ) : nullptr;
-				if( splittarget && dmg.full_damage > 0 )
+				if( splittarget != nullptr && dmg.full_damage > 0 )
 				{
 					// calculate damage
 					tmpsplit = itr->m_flatDamageSplit;
@@ -2442,6 +2437,7 @@ else
 						tmpsplit = dmg.full_damage;
 					splitdamage += tmpsplit;
 					dmg.full_damage -= tmpsplit;
+					
 					// TODO: pct damage
 					if( splitdamage )
 					{
