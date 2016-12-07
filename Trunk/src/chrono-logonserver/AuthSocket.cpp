@@ -101,15 +101,15 @@ void AuthSocket::HandleChallenge()
 	// Client Build
 	uint16 build = m_challenge.build;
 
-	// If the build is > allowed send BUILD ERROR message.
-	if(build > LogonServer::getSingleton().clientbuild)
+	// If less then min or greater then max send unable to validate game client.
+	if(build < LogonServer::getSingleton().minbuild || build > LogonServer::getSingleton().maxbuild)
 	{
 		// Your client is incorrect.
 		SendChallengeError(CE_WRONG_BUILD_NUMBER);
 		return;
 	}
 
-	if(build < LogonServer::getSingleton().clientbuild)
+	if(build < LogonServer::getSingleton().minbuild)
 	{
 		// can we patch?
 		char flippedloc[5] = {0,0,0,0,0};
@@ -525,7 +525,7 @@ void AuthSocket::HandleReconnectChallenge()
 	readBuffer.Remove(full_size + 4);
 
 	// Check client build.
-	if(m_challenge.build != LogonServer::getSingleton().clientbuild)
+	if(m_challenge.build < LogonServer::getSingleton().minbuild || m_challenge.build > LogonServer::getSingleton().maxbuild)
 	{
 		SendChallengeError(CE_WRONG_BUILD_NUMBER);
 		return;
