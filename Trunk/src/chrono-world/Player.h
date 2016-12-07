@@ -1546,7 +1546,6 @@ public:
 	int32								m_heartbeatDisable;
 	uint32								m_lastMoveTime;
 	bool 								m_speedChangeInProgress;
-	uint32								m_flyHackChances;
 
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);
@@ -1644,8 +1643,6 @@ public:
     void SetHonorLastWeekStandingPos(int32 standingPos){ m_standing_pos = standingPos; }
 	
 	bool blinked;
-	uint16 m_speedhackChances;
-	uint16 m_cheatEngineChances;
 	uint32 m_explorationTimer;
 	
 	// DBC stuff
@@ -1788,9 +1785,6 @@ public:
 		SetMovement(MOVE_LAND_WALK, 8);
 		SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH) );
 	}
-
-	void ResetSpeedHack();
-	void DelaySpeedHack(uint32 ms);
 
 	float m_WeaponSubClassDamagePct[21];
 
@@ -2022,12 +2016,6 @@ public:
 	void addDeletedSpell(uint32 id) { mDeletedSpells.insert( id ); }
 
 	map<uint32, uint32> m_forcedReactions;
-
-	uint32 m_speedhackCheckTimer;
-	uint32 m_flyhackCheckTimer;
-	void _SpeedhackCheck();
-	bool IsFlyHackEligible();
-	void _FlyhackCheck();
 
 	bool m_passOnLoot;
 	uint32 m_tradeSequence;

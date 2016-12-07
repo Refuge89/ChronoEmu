@@ -1,21 +1,6 @@
-/*
- * Chrono Emulator
- * Copyright (C) 2010 ChronoEmu Team <http://www.forsakengaming.com/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+//
+// Chrono Emu (C) 2016
+//
 
 #include "StdAfx.h"
 
@@ -1223,17 +1208,7 @@ void World::Rehash(bool load)
 	SocketSendBufSize = Config.MainConfig.GetIntDefault("WorldSocket", "SendBufSize", WORLDSOCKET_SENDBUF_SIZE);
 #endif
 
-	bool log_enabled = Config.MainConfig.GetBoolDefault("Log", "Cheaters", false);
-	if(Anticheat_Log->IsOpen())
-	{
-		if(!log_enabled)
-			Anticheat_Log->Close();
-	}
-	else
-		if(log_enabled)
-			Anticheat_Log->Open();
-
-	log_enabled = Config.MainConfig.GetBoolDefault("Log", "GMCommands", false);
+	bool log_enabled = Config.MainConfig.GetBoolDefault("Log", "GMCommands", false);
 	if(GMCommand_Log->IsOpen())
 	{
 		if(!log_enabled)
@@ -1317,11 +1292,6 @@ void World::Rehash(bool load)
 	map_unload_time=Config.MainConfig.GetIntDefault("Server", "MapUnloadTime", 0);
 	cross_faction_world = Config.MainConfig.GetBoolDefault("Server", "CrossFactionInteraction", false);
 
-	antihack_teleport = Config.MainConfig.GetBoolDefault("AntiHack", "Teleport", true);
-	antihack_speed = Config.MainConfig.GetBoolDefault("AntiHack", "Speed", true);
-	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
-	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
-	SpeedhackProtection = antihack_speed;
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
 	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
 
@@ -1334,13 +1304,6 @@ void World::Rehash(bool load)
 
 	m_movementCompressThreshold = Config.MainConfig.GetFloatDefault("Movement", "CompressThreshold", 25.0f);
 	m_movementCompressThreshold *= m_movementCompressThreshold;		// square it to avoid sqrt() on checks
-
-	m_speedHackThreshold = Config.MainConfig.GetFloatDefault("AntiHack", "SpeedThreshold", -500.0f);
-	m_speedHackLatencyMultiplier = Config.MainConfig.GetFloatDefault("AntiHack", "SpeedLatencyCompensation", 0.25f);
-	m_speedHackResetInterval = Config.MainConfig.GetIntDefault("AntiHack", "SpeedResetPeriod", 5000);
-	antihack_cheatengine = Config.MainConfig.GetBoolDefault("AntiHack", "CheatEngine", false);
-	m_CEThreshold = Config.MainConfig.GetIntDefault("AntiHack", "CheatEngineTimeDiff", 10000);
-	m_wallhackthreshold = Config.MainConfig.GetFloatDefault("AntiHack", "WallHackThreshold", 5.0f);
 
 	// Warden Configuration
 	m_WardenEnabled = Config.MainConfig.GetBoolDefault("Warden", "Warden.Kick", false);
@@ -1400,107 +1363,10 @@ void World::LoadAccountDataProc(QueryResultVector& results, uint32 AccountId)
 	s->LoadAccountDataProc(results[0].result);
 }
 
-void World::CleanupCheaters()
-{
-	/*uint32 guid;
-	string name;
-	uint32 cl;
-	uint32 level;
-	uint32 talentpts;
-	char * start, *end;
-	Field * f;
-	uint32 should_talents;
-	uint32 used_talents;
-	SpellEntry * sp;
-
-	QueryResult * result = CharacterDatabase.Query("SELECT guid, name, class, level, available_talent_points, spells FROM characters");
-	if(result == nullptr)
-		return;
-
-	do 
-	{
-		f = result->Fetch();
-		guid = f[0].GetUInt32();
-		name = string(f[1].GetString());
-		cl = f[2].GetUInt32();
-		level = f[3].GetUInt32();
-		talentpts = f[4].GetUInt32();
-		start = f[5].GetString();
-		should_talents = (level<10 ? 0 : level - 9);
-		used_talents -= 
-        		
-
-		start = (char*)get_next_field.GetString();//buff;
-		while(true) 
-		{
-			end = strchr(start,',');
-			if(!end)break;
-			*end=0;
-			sp = dbcSpell.LookupEntry(atol(start));
-			start = end +1;
-
-			if(sp->talent_tree)
-
-		}
-
-	} while(result->NextRow());*/
-
-}
-
 void World::CheckForExpiredInstances()
 {
 	sInstanceMgr.CheckForExpiredInstances();
 }
-
-/* -- Not used anymore
-void World::PollMailboxInsertQueue(DatabaseConnection * con)
-{
-	QueryResult * result;
-	Field * f;
-	Item * pItem;
-	uint32 itemid;
-	uint32 stackcount;
-
-	CharacterDatabase.FWaitExecute("LOCK TABLES `mailbox_insert_queue` WRITE", con);
-	result = CharacterDatabase.FQuery("SELECT * FROM mailbox_insert_queue", con);
-	CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
-	CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
-	if( result != nullptr )
-	{
-		Log.Notice("MailboxQueue", "Sending %u queued messages....", result->GetRowCount());
-		do 
-		{
-			f = result->Fetch();
-			itemid = f[6].GetUInt32();
-			stackcount = f[7].GetUInt32();
-			
-			if( itemid != 0 )
-			{
-				pItem = objmgr.CreateItem( itemid, nullptr );
-				if( pItem != nullptr )
-				{
-					pItem->SetUInt32Value( ITEM_FIELD_STACK_COUNT, stackcount );
-					pItem->SaveToDB( 0, 0, true, nullptr );
-				}
-			}
-			else
-				pItem = nullptr;
-
-			Log.Notice("MailboxQueue", "Sending message to %u (item: %u)...", f[1].GetUInt32(), itemid);
-			sMailSystem.SendAutomatedMessage( 0, f[0].GetUInt64(), f[1].GetUInt64(), f[2].GetString(), f[3].GetString(), f[5].GetUInt32(),
-				0, pItem ? pItem->GetGUID() : 0, f[4].GetUInt32() );
-
-			if( pItem != nullptr )
-				delete pItem;
-
-		} while ( result->NextRow() );
-		delete result;
-		Log.Notice("MailboxQueue", "Done.");
-		CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
-	}
-}
-*/
-
 
 #define LOAD_THREAD_SLEEP 180
 

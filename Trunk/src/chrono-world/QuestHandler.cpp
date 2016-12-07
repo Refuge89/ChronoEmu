@@ -1,21 +1,6 @@
-	/*
- * Chrono Emulator
- * Copyright (C) 2010 ChronoEmu Team <http://www.forsakengaming.com/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+//
+// Chrono Emu (C) 2016
+//
 
 #include "StdAfx.h"
 initialiseSingleton( QuestMgr );
@@ -175,24 +160,13 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	/*if (!qst_giver->FindQuest(quest_id, QUESTGIVER_QUEST_START | QUESTGIVER_QUEST_END))
-	{
-		sLog.outDebug("WORLD: QuestGiver doesn't have that quest.");
-		return;
-	}*/	// bleh.. not needed.. maybe for antihack later on would be a good idea though
-	
 	if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_CHAT))
 	{
-		sQuestMgr.BuildQuestDetails(&data, qst,qst_giver,1, language, _player);	 // 0 because we want goodbye to function
+		// 0 because we want goodbye to function
+		sQuestMgr.BuildQuestDetails(&data, qst,qst_giver,1, language, _player);
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS." );
 	}
-	/*else if (status == QMGR_QUEST_FINISHED)
-	{
-		sQuestMgr.BuildOfferReward(&data, qst, qst_giver, 1);
-		SendPacket(&data);
-		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD." );
-	}*/
 	else if (status == QMGR_QUEST_NOT_FINISHED || status == QMGR_QUEST_FINISHED)
 	{
 		sQuestMgr.BuildRequestItems(&data, qst, qst_giver, status, language);

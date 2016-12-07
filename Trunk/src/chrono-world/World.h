@@ -347,11 +347,11 @@ public:
 
 	uint32 GetMaxLevel(Player * plr);
 
-	/** Reloads the config and sets all of the setting variables 
-	 */
+	//
+	// Reloads the config and sets all of the setting variables 
+	//
 	void Rehash(bool load);
 
-	void CleanupCheaters();
 	WorldSession* FindSession(uint32 id);
 	WorldSession* FindSessionByName(const char *);
 	void AddSession(WorldSession *s);
@@ -521,12 +521,6 @@ public:
 
 	bool show_gm_in_who_list;
 	uint32 map_unload_time;
-
-	bool antihack_teleport;
-	bool antihack_speed;
-	bool antihack_flight;
-	bool antihack_cheatengine;
-	bool no_antihack_on_gm;
 
 	// Warden Config
 	bool m_WardenEnabled;

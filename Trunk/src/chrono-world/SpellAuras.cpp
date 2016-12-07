@@ -2145,7 +2145,6 @@ void Aura::SpellAuraModConfuse(bool apply)
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x00);
 			p_target->GetSession()->SendPacket(&data1);
-			p_target->DelaySpeedHack( GetDuration() );
 		}
 	}
 	else
@@ -2280,7 +2279,6 @@ void Aura::SpellAuraModFear(bool apply)
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x00);
 			p_target->GetSession()->SendPacket(&data1);
-			p_target->DelaySpeedHack( GetDuration() );
 		}
 	}
 	else

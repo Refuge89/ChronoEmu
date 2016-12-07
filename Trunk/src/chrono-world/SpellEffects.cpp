@@ -1971,8 +1971,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 			posZ = fz2;
 			p_caster->blinked = true;
 		p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), posX, posY, posZ, m_caster->GetOrientation() );
-			// reset heartbeat for a little while, 5 seconds maybe?
-		p_caster->DelaySpeedHack( 5000 );
+		// reset heartbeat for a little while, 5 seconds maybe?
 		++p_caster->m_heartbeatDisable;
 		p_caster->z_axisposition = 0.0f;
 	}
@@ -1988,10 +1987,6 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 		p_caster->blinked = true;
 		
 		p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), posX, posY, posZ, m_caster->GetOrientation() );
-			// reset heartbeat for a little while, 5 seconds maybe?
-		p_caster->DelaySpeedHack( 5000 );
-		++p_caster->m_heartbeatDisable;
-		p_caster->z_axisposition = 0.0f;
 	}
 }
 
@@ -4253,14 +4248,6 @@ void Spell::SpellEffectCharge(uint32 i)
 	}
 	u_caster->setAttackTimer(time, false);
 	u_caster->setAttackTimer(time, true);
-
-
-	// trigger an event to reset speedhack detection
-	if( p_caster )
-	{
-		p_caster->DelaySpeedHack( time + 1000 );
-		p_caster->z_axisposition = 0.0f;
-	}
 }
 
 void Spell::SpellEffectPlayerPull( uint32 i )
