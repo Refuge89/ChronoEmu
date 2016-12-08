@@ -365,18 +365,18 @@ void MapMgr::PushObject(Object *obj)
 			{
 				ASSERT((obj->GetUIdFromGUID()) <= m_CreatureHighGuid);
 				m_CreatureStorage[obj->GetUIdFromGUID()] = TO_CREATURE(obj);
-				if(TO_CREATURE(obj)->m_spawn != nullptr)
+				if (TO_CREATURE(obj)->m_spawn != nullptr)
 				{
-					_sqlids_creatures.insert(make_pair( TO_CREATURE(obj)-> GetSQL_id(), TO_CREATURE(obj) ) );
+					_sqlids_creatures.insert(std::make_pair(TO_CREATURE(obj)->GetSQL_id(), TO_CREATURE(obj)));
 				}
 			}break;
 
 		case HIGHGUID_TYPE_GAMEOBJECT:
 			{
-				m_gameObjectStorage.insert(make_pair(obj->GetGUID(), TO_GAMEOBJECT(obj)));
-				if(((GameObject*)obj)->m_spawn != nullptr)
+				m_gameObjectStorage[obj->GetUIdFromGUID()] = TO_GAMEOBJECT(obj);
+				if (TO_GAMEOBJECT(obj)->m_spawn != nullptr)
 				{
-					_sqlids_gameobjects.insert(make_pair( ((GameObject*)obj)->m_spawn->id, ((GameObject*)obj) ) );
+					_sqlids_gameobjects.insert(std::make_pair(TO_GAMEOBJECT(obj)->m_spawn->id, TO_GAMEOBJECT(obj)));
 				}
 			}break;
 
@@ -426,7 +426,7 @@ void MapMgr::PushStaticObject(Object *obj)
 			break;
 
 		case HIGHGUID_TYPE_GAMEOBJECT:
-			m_gameObjectStorage.insert(make_pair(obj->GetGUID(), TO_GAMEOBJECT(obj)));
+			m_gameObjectStorage[obj->GetUIdFromGUID()] = static_cast<GameObject*>(obj);
 			break;
 
 		default:
