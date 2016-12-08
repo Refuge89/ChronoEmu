@@ -329,8 +329,6 @@ void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_give
 	}
 
 	*data <<  uint32(1);
-	//*data << uint32(0);		 // "Suggested players"
-
 	
 	*data << qst->count_reward_choiceitem;
 	ItemPrototype *ip;
@@ -345,7 +343,7 @@ void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_give
 		if(ip)
 			*data << ip->DisplayInfoID;
 		else
-			*data << uint32( 0x00 );
+			*data << uint32(0x00);
 	}
 
 	*data << qst->count_reward_item;
@@ -364,8 +362,8 @@ void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_give
 
 	*data << GenerateRewardMoney(plr, qst);
 	
-	*data << qst->required_itemcount;
-	for (uint32 i=0; i <  4; i++)
+	*data << qst->required_itemcount[i];
+	for (i = 0; i <  4; i++)
 	{
 		*data << uint32(qst->reward_item[i]);
 		*data << uint32(qst->reward_itemcount[i]);
