@@ -390,20 +390,6 @@ protected:
 	void HandleReadyCheckOpcode(WorldPacket& recv_data);
 	void HandleGroupPromote(WorldPacket& recv_data);
 	
-	// LFG opcodes
-	void HandleEnableAutoJoin(WorldPacket& recvPacket);
-	void HandleDisableAutoJoin(WorldPacket& recvPacket);
-	void HandleEnableAutoAddMembers(WorldPacket& recvPacket);
-	void HandleDisableAutoAddMembers(WorldPacket& recvPacket);
-	void HandleSetLookingForGroupComment(WorldPacket& recvPacket);
-	void HandleMsgLookingForGroup(WorldPacket& recvPacket);
-	void HandleSetLookingForGroup(WorldPacket& recvPacket);
-	void HandleSetLookingForMore(WorldPacket& recvPacket);
-	void HandleSetLookingForNone(WorldPacket& recvPacket);
-	void HandleLfgClear(WorldPacket & recvPacket);
-	void HandleLfgInviteAccept(WorldPacket & recvPacket);
-	void HandleLfgInviteDeny(WorldPacket & recvPacket);
-
 	/// Taxi opcodes (TaxiHandler.cpp)
 	void HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvPacket);
 	void HandleTaxiQueryAvaibleNodesOpcode(WorldPacket& recvPacket);
@@ -571,18 +557,6 @@ protected:
 	void HandleCharterSign(WorldPacket &recv_data);
 	void HandleCharterRename(WorldPacket & recv_data);
 	void HandleSetGuildInformation(WorldPacket & recv_data);
-	void HandleGuildLog(WorldPacket & recv_data);
-	void HandleGuildBankViewTab(WorldPacket & recv_data);
-	void HandleGuildBankViewLog(WorldPacket & recv_data);
-	void HandleGuildBankOpenVault(WorldPacket & recv_data);
-	void HandleGuildBankBuyTab(WorldPacket & recv_data);
-	void HandleGuildBankDepositMoney(WorldPacket & recv_data);
-	void HandleGuildBankWithdrawMoney(WorldPacket & recv_data);
-	void HandleGuildBankDepositItem(WorldPacket & recv_data);
-	void HandleGuildBankWithdrawItem(WorldPacket & recv_data);
-	void HandleGuildBankGetAvailableAmount(WorldPacket & recv_data);
-	void HandleGuildBankModifyTab(WorldPacket & recv_data);
-	void HandleGuildGetFullPermissions(WorldPacket & recv_data);
 
 	// Pet
 	void HandlePetAction(WorldPacket & recv_data);
@@ -638,7 +612,7 @@ protected:
 
 	//instances
 	void HandleResetInstanceOpcode(WorldPacket& recv_data);
-    void HandleDungeonDifficultyOpcode(WorldPacket& recv_data);
+	void HandleMeetingStoneInfoOpcode(WorldPacket& recPacket);
 
 	uint8 TrainerGetSpellStatus(TrainerSpell* pSpell);
 	void SendMailError(uint32 error);

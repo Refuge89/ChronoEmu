@@ -804,6 +804,7 @@ void WorldSession::InitPacketHandlerTable()
 	// Meeting Stone / Instances
 	WorldPacketHandlers[CMSG_SUMMON_RESPONSE].handler							= &WorldSession::HandleSummonResponseOpcode;
 	WorldPacketHandlers[CMSG_RESET_INSTANCE].handler							= &WorldSession::HandleResetInstanceOpcode;
+	WorldPacketHandlers[CMSG_MEETINGSTONE_INFO].handler = &WorldSession::HandleMeetingStoneInfoOpcode;
 	WorldPacketHandlers[CMSG_SELF_RES].handler								  = &WorldSession::HandleSelfResurrectOpcode;
 	WorldPacketHandlers[MSG_RANDOM_ROLL].handler								= &WorldSession::HandleRandomRollOpcode;
 

@@ -1983,3 +1983,16 @@ void WorldSession::HandleSetAutoLootPassOpcode(WorldPacket & recv_data)
 
 	_player->m_passOnLoot = (on!=0) ? true : false;
 }
+
+//
+// MEETING STONE INFO 
+// Opcode: CMSG_MEETINGSTONE_INFO
+//
+void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket & recv_data)
+{
+	DEBUG_LOG("WORLD: Received CMSG_MEETINGSTONE_INFO");
+
+	WorldPacket data(SMSG_MEETINGSTONE_SETQUEUE, 5);
+	data << uint32(0) << uint8(6);
+	SendPacket(&data);
+}
