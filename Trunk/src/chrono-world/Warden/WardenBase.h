@@ -77,8 +77,6 @@ class WardenBase
         WardenBase();
         ~WardenBase();
 
-		CRandomMersenne * RanMers;
-
         virtual void Init(WorldSession *pClient, BigNumber *K);
         virtual ClientWardenModule *GetModuleForClient(WorldSession *session);
         virtual void InitializeModule();
@@ -108,6 +106,7 @@ class WardenBase
         bool m_WardenDataSent;
         uint32 m_WardenKickTimer;                           // time after send packet
         uint32 m_WardenTimer;
+		uint32 _previousTimestamp;
         ClientWardenModule *Module;
         bool m_initialized;
 };

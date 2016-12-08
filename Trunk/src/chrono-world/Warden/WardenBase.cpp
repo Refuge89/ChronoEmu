@@ -7,6 +7,8 @@
 
 #include "StdAfx.h"
 
+#define IN_MILLISECONDS 1000
+
 WardenBase::WardenBase() : iCrypto(16), oCrypto(16), m_WardenCheckTimer(10000/*10 sec*/), m_WardenKickTimer(0), m_WardenDataSent(false), m_initialized(false)
 {
 }
@@ -103,35 +105,34 @@ void WardenBase::RequestModule()
 
 void WardenBase::Update()
 {
-    if (m_initialized)
-    {
-        uint32 ticks = getMSTime();
-        uint32 diff = ticks - m_WardenTimer;
-        m_WardenTimer = ticks;
+	if (m_initialized)
+	{
+		uint32 currentTimestamp = getMSTime();
+		uint32 diff = currentTimestamp - _previousTimestamp;
+		_previousTimestamp = currentTimestamp;
 
-        if (m_WardenDataSent)
-        {
-			// This might need checked, its supposed to be milliseconds.
-            // 1.5 minutes after send packet
-            if ((m_WardenKickTimer > 90 * 1000) && sWorld.m_WardenEnabled)
-                    Client->Disconnect();
-            else
-                m_WardenKickTimer += diff;
-        }
-        else if (m_WardenCheckTimer > 0)
-        {
-            if (diff >= m_WardenCheckTimer)
-            {
-                RequestData();
-                
-				// This might need checked supposed to be milliseconds.
-				// 25-35 second
-                m_WardenCheckTimer = RanMers->IRandom(25, 35) * 1000;
-            }
-            else
-                m_WardenCheckTimer -= diff;
-        }
-    }
+		if (m_WardenDataSent)
+		{
+			// 1.5 minutes after send packet
+			if ((m_WardenKickTimer > 90 * IN_MILLISECONDS) && sWorld.m_WardenEnabled)
+			{
+				Client->GetPlayer()->Kick();
+			}
+			else
+			{
+				m_WardenKickTimer += diff;
+			}
+		}
+		else if (m_WardenCheckTimer > 0)
+		{
+			if (diff >= m_WardenCheckTimer)
+			{
+				RequestData();
+			}
+			else
+				m_WardenCheckTimer -= diff;
+		}
+	}
 }
 
 void WardenBase::DecryptData(uint8 *Buffer, uint32 Len)

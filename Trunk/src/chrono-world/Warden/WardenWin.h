@@ -69,7 +69,6 @@ class WardenWin : WardenBase
         WardenWin();
         ~WardenWin();
 
-		CRandomMersenne * RanMers;
         void Init(WorldSession *pClient, BigNumber *K);
         ClientWardenModule *GetModuleForClient(WorldSession *session);
         void InitializeModule();
@@ -82,6 +81,8 @@ class WardenWin : WardenBase
         uint32 ServerTicks;
         std::vector<uint32> SendDataId;
         std::vector<uint32> MemCheck;
+		std::list<uint16> _otherChecksTodo;
+		std::list<uint16> _currentChecks;
 };
 
 #endif

@@ -200,9 +200,13 @@ void WardenWin::RequestData()
 
     for (int i = 0; i < 5; ++i)                             // for now include 5 random checks
     {
-        id = RanMers->IRandom(1, maxid - 1);
+		_otherChecksTodo.back();
+		_otherChecksTodo.pop_back();
+
+		_currentChecks.push_back(id);
+
         wd = WardenDataStorage.GetWardenDataById(id);
-        SendDataId.push_back(id);
+
         switch (wd->Type)
         {
             case MPQ_CHECK:

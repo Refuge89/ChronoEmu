@@ -36,7 +36,7 @@ void CWardenDataStorage::LoadWardenDataResult()
 
     if (!result)
     {
-        sLog.outString(">> Loaded %u warden data and results", count);
+        sLog.outString("World: %u Warden Entries Loaded", count);
         return;
     }
 
@@ -105,7 +105,7 @@ void CWardenDataStorage::LoadWardenDataResult()
 
     delete result;
 
-    sLog.outString(">> Loaded %u warden data and results", count);
+    sLog.outString("World: %u Warden Entries Loaded", count);
 }
 
 WardenData *CWardenDataStorage::GetWardenDataById(uint32 Id)

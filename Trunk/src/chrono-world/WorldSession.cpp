@@ -66,6 +66,9 @@ WorldSession::~WorldSession()
 	if(permissions)
 		delete [] permissions;
 
+	if (m_Warden)
+		delete m_Warden;
+	
 	WorldPacket *packet;
 
 	while((packet = _recvQueue.Pop()))
@@ -222,6 +225,11 @@ int WorldSession::Update(uint32 InstanceID)
 		if(!_logoutTime)
 			_logoutTime = m_currMsTime + PLAYER_LOGOUT_DELAY;
 	}
+
+	//
+	// Warden System
+	// To-Do: Call m_Warden->Update();
+	//
 
 	return 0;
 }
