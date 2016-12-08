@@ -79,12 +79,6 @@ Group::Group(bool Assign)
 	m_isqueued=false;
 	m_difficulty=0;
 	m_assistantLeader=m_mainAssist=m_mainTank=nullptr;
-#ifdef VOICE_CHAT
-	m_voiceChannelRequested = false;
-	m_voiceChannelId = 0;
-	m_voiceMemberCount = 0;
-	memset(m_voiceMembersList, 0, sizeof(Player*)*41);
-#endif
 }
 
 Group::~Group()
@@ -440,10 +434,6 @@ void Group::RemovePlayer(PlayerInfo * info)
 
 	info->m_Group=nullptr;
 	info->subGroup=-1;
-#ifdef VOICE_CHAT
-	if( info->groupVoiceId <= 0 )
-		RemoveVoiceMember(info);
-#endif
 
 	if(sg==nullptr)
 	{

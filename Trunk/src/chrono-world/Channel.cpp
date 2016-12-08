@@ -57,20 +57,12 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	m_team = team;
 	m_id = type_id;
 	m_minimumLevel = 1;
-#ifdef VOICE_CHAT
-	voice_enabled = sVoiceChatHandler.CanUseVoiceChat();
-	i_voice_channel_id = -1;
-#endif
 
 	pDBC = dbcChatChannels.LookupEntryForced(type_id);
 	if( pDBC != nullptr )
 	{
 		m_general = true;
 		m_announce = false;
-
-#ifdef VOICE_CHAT
-		voice_enabled = false;
-#endif
 
 		m_flags |= 0x10;			// general flag
 		// flags (0x01 = custom?, 0x04 = trade?, 0x20 = city?, 0x40 = lfg?, , 0x80 = voice?,		
@@ -146,27 +138,6 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 
 	plr->GetSession()->SendPacket(&data);
 
-#ifdef VOICE_CHAT
-	if(voice_enabled)
-	{
-		data.Initialize(SMSG_CHANNEL_NOTIFY);
-		data << uint8(CHANNEL_NOTIFY_FLAG_VOICE_ON) << m_name << plr->GetGUID();
-		plr->GetSession()->SendPacket(&data);
-
-		//JoinVoiceChannel(plr);
-
-		data.Initialize(0x03d9);
-		//data << uint32(0x00002e57);
-		//data << uint32(0xe0e10000);
-
-		// this is voice channel id?
-		data << uint64(0xe0e10000000032abULL);
-		data << uint8(0);		// 00=custom,03=party,04=raid
-		data << m_name;
-		data << plr->GetGUID();
-		plr->GetSession()->SendPacket(&data);
-	}
-#endif
 }
 
 void Channel::Part(Player * plr)
@@ -185,16 +156,6 @@ void Channel::Part(Player * plr)
     
 	flags = itr->second;
 	m_members.erase(itr);
-
-#ifdef VOICE_CHAT
-	itr = m_VoiceMembers.find(plr);
-	if(itr != m_VoiceMembers.end())
-	{
-		m_VoiceMembers.erase(itr);
-		if(i_voice_channel_id != (uint16)-1)
-			SendVoiceUpdate();
-	}
-#endif
 
 	plr->LeftChannel(this);
 
@@ -472,15 +433,6 @@ void Channel::Kick(Player * plr, Player * die_player, bool ban)
 	}
 
 	m_members.erase(itr);
-#ifdef VOICE_CHAT
-	itr = m_VoiceMembers.find(plr);
-	if(itr != m_VoiceMembers.end())
-	{
-		m_VoiceMembers.erase(itr);
-		if(i_voice_channel_id != (uint16)-1)
-			SendVoiceUpdate();
-	}
-#endif
 
 	if(flags & CHANNEL_FLAG_OWNER)
 		SetOwner(nullptr, nullptr);
@@ -975,117 +927,3 @@ ChannelMgr::ChannelMgr()
 {
 
 }
-
-#ifdef VOICE_CHAT
-void Channel::VoiceChannelCreated(uint16 id)
-{
-	Log.Debug("VoiceChannelCreated", "id %u", id);
-	i_voice_channel_id = id;
-
-	SendVoiceUpdate();
-}
-
-void Channel::JoinVoiceChannel(Player * plr)
-{
-	m_lock.Acquire();
-	if(m_VoiceMembers.find(plr) == m_VoiceMembers.end())
-	{
-		m_VoiceMembers.insert(make_pair(plr, 0x06));
-		if(m_VoiceMembers.size() == 1)		// create channel
-			sVoiceChatHandler.CreateVoiceChannel(this);
-
-		if(i_voice_channel_id != (uint16)-1)
-			SendVoiceUpdate();
-	}
-	m_lock.Release();
-}
-
-void Channel::PartVoiceChannel(Player * plr)
-{
-	m_lock.Acquire();
-	MemberMap::iterator itr = m_VoiceMembers.find(plr);
-	if(itr != m_VoiceMembers.end())
-	{
-		m_VoiceMembers.erase(itr);
-		if(m_VoiceMembers.size() == 0)
-			sVoiceChatHandler.DestroyVoiceChannel(this);
-
-		if(i_voice_channel_id != (uint16)-1)
-			SendVoiceUpdate();
-	}
-	m_lock.Release();
-}
-
-void Channel::SendVoiceUpdate()
-{
-	/*
-	0x039E - SMSG_VOICE_SESSION
-	uint64 channel_id
-	uint16 voice_channel_id
-	uint8 channel_type (0=channel,2=party)
-	string name
-	16 bytes - unk, some sort of encryption key?
-	uint32 ip
-	uint16 port
-	uint8 player_count
-	<for each player>
-		uint64 guid
-		uint8 user_id
-		uint8 flags
-	uint8 unk
-	*/
-
-	WorldPacket data(SMSG_VOICE_SESSION, 300);
-	//uint8 m_encryptionKey[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint8 m_encryptionKey[16] = { 0xba, 0x4d, 0x45, 0x60, 0x63, 0xcc, 0x12, 0xBC, 0x73, 0x94, 0x90, 0x03, 0x18, 0x14, 0x45, 0x1F };
-	uint8 counter=1;
-	m_lock.Acquire();
-	MemberMap::iterator itr;
-
-	//data << uint32(i_voice_channel_id) << uint32(0);
-	data << uint64(0xe0e10000000032abULL);
-	//data << i_voice_channel_id;
-	data << uint16(0x5e26);		// used in header of udp packets
-	data << uint8(0);
-	data << m_name;
-	data.append(m_encryptionKey, 16);
-	data << uint32(htonl(sVoiceChatHandler.GetVoiceServerIP()));
-	data << uint16(htons(sVoiceChatHandler.GetVoiceServerPort()));
-	//data << uint16(sVoiceChatHandler.GetVoiceServerPort());
-	data << uint8(m_VoiceMembers.size());
-    
-	for(itr = m_VoiceMembers.begin(); itr != m_VoiceMembers.end(); ++itr)
-	{
-		data << itr->first->GetGUID();
-		data << counter;
-		data << uint8(itr->second);
-	}
-
-	data << uint8(6);
-
-	for(itr = m_VoiceMembers.begin(); itr != m_VoiceMembers.end(); ++itr)
-		itr->first->GetSession()->SendPacket(&data);
-
-	m_lock.Release();
-}
-
-void Channel::VoiceDied()
-{
-	m_lock.Acquire();
-	m_VoiceMembers.clear();
-	i_voice_channel_id = (uint16)-1;
-	m_lock.Release();
-}
-
-void ChannelMgr::VoiceDied()
-{
-	lock.Acquire();
-	for(uint32 i = 0; i < 2; ++i)
-	{
-		for(ChannelList::iterator itr = Channels[i].begin(); itr != Channels[i].end(); ++itr)
-			itr->second->VoiceDied();
-	}
-	lock.Release();
-}
-
-#endif

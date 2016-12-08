@@ -283,9 +283,6 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pn->guild=nullptr;
 	pn->guildRank=nullptr;
 	pn->guildMember=nullptr;
-#ifdef VOICE_CHAT
-	pn->groupVoiceId = -1;
-#endif
 	objmgr.AddPlayerInfo(pn);
 
 	pNewChar->ok_to_remove = true;

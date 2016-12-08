@@ -352,9 +352,6 @@ void ObjectMgr::LoadPlayersInfo()
 			pn->guild=nullptr;
 			pn->guildRank=nullptr;
 			pn->guildMember=nullptr;
-#ifdef VOICE_CHAT
-			pn->groupVoiceId = -1;
-#endif
 
 			if(pn->race==RACE_HUMAN||pn->race==RACE_DWARF||pn->race==RACE_GNOME||pn->race==RACE_NIGHTELF)
 				pn->team = 0;
