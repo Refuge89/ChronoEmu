@@ -64,6 +64,17 @@ struct ReflectSpellSchool
 	int32 require_aura_hash;
 };
 
+struct DamageSplitTarget
+{
+	uint64 m_target;
+	uint32 m_spellId;
+	float m_pctDamageSplit;
+	uint32 m_flatDamageSplit;
+	uint8 damage_type;
+	bool active;
+	void * creator;
+};
+
 typedef struct
 {
 	uint32 spellid;
@@ -909,7 +920,6 @@ public:
 	bool m_damgeShieldsInUse;
 	std::list<struct DamageProc> m_damageShields;
 	std::list<struct ReflectSpellSchool*> m_reflectSpellSchool;
- 	std::list<struct DamageSplitTarget> m_damageSplitTargets;
  
 	std::list<struct ProcTriggerSpell> m_procSpells;
 //	std::map<uint32,ProcTriggerSpellOnSpellList> m_procSpellonSpell; //index is namehash
@@ -918,6 +928,9 @@ public:
 	bool m_chargeSpellsInUse;
 	CHRONO_INLINE void SetOnMeleeSpell(uint32 spell ) { m_meleespell = spell; }
 	CHRONO_INLINE uint32 GetOnMeleeSpell() { return m_meleespell; }
+	
+	struct DamageSplitTarget m_damageSplitTargets;
+	uint32 DoDamageSplitTarget(uint32 res, uint32 school_type, bool melee_dmg);
 
 	// Spell Crit
 	float spellcritperc;

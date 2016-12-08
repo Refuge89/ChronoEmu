@@ -5193,95 +5193,53 @@ void Aura::SpellAuraModPercStat(bool apply)
 
 void Aura::SpellAuraSplitDamage(bool apply)
 {
-	
-	if( !m_target->IsUnit() )
-		return;
-//SUPA:FIXU
+	DamageSplitTarget *ds;
+	Unit * caster;
 
-	// rewrite, copy-paste DamageProc struct.
-
-	if(apply)
-	{
-		DamageSplitTarget ds;
-		ds.m_flatDamageSplit = 0;
-		ds.m_spellId = GetSpellProto()->Id;
-		ds.m_pctDamageSplit = mod->m_amount / 100.0f;
-		ds.damage_type = mod->m_miscValue;
-		ds.creator = (void*)this;
-		ds.m_target = GetCaster()->GetGUID();
-		m_target->m_damageSplitTargets.push_back(ds);
-		//sLog.outDebug("registering dmg split %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
-	}
-	else
-	{
-		for(std::list<struct DamageSplitTarget>::iterator i = m_target->m_damageSplitTargets.begin();i != m_target->m_damageSplitTargets.end();i++)
-		{
-			if(i->creator == this)
-			{
-				m_target->m_damageSplitTargets.erase(i);
-				break;
-			}
-		}
-	}
-	//Unit* uCaster = GetUnitCaster();
-	//if( !uCaster )
-	//	return;
-
-	//if( m_target == uCaster )
-	//	return;
-
-	// Correct (?) implementation of SplitDamage.
-	
-	
-
-
-	/* COPY: DamageShield 
-		if(apply)
-	{
-		SetPositive();
-		DamageProc ds;// = new DamageShield();
-		ds.m_damage = mod->m_amount;
-		ds.m_spellId = GetSpellProto()->Id;
-		ds.m_school = GetSpellProto()->School;
-		ds.m_flags = PROC_TARGET_MELEE_HIT | PROC_MISC; //maybe later we might want to add other flags too here
-		ds.owner = (void*)this;
-		m_target->m_damageShields.push_back(ds);
-	}
-	else
-	{
-		for(std::list<struct DamageProc>::iterator i = m_target->m_damageShields.begin();i != m_target->m_damageShields.end();i++)
-		{
-			if(i->owner==this)
-			{
-				 m_target->m_damageShields.erase(i);
-				 return;
-			}
-		}
-	}
-*/
-	//brrr, temporarty fix, this is used only by soul link atm:P
-/*
-	if( !m_target->IsPet() )
+	if (!m_target || !m_target->IsUnit())
 		return;
 
-	Player* petOwner = static_cast< Pet* >( m_target )->GetPetOwner();
+	caster = static_cast< Unit* >(GetCaster());
+	if (!caster)
+		return;
 
-	float val;
-	if(apply)
+	ds = &caster->m_damageSplitTargets;
+
+	if (apply)
 	{
-		val = mod->m_miscValue/100.0f;
-	}
-	else
-	{
-		val = -mod->m_miscValue/100.0f;
+		ds->m_flatDamageSplit = 0;
+		ds->m_spellId = GetSpellProto()->Id;
+		ds->m_pctDamageSplit = mod->m_miscValue / 100.0f;
+		ds->damage_type = mod->m_type;
+		ds->m_target = m_target->GetGUID();
 	}
 
-	for(uint32 x=0;x<7;x++)
+	ds->active = apply;
+}
+
+void Aura::SpellAuraSplitDamageFlat(bool apply)
+{
+	DamageSplitTarget *ds;
+	Unit *caster;
+
+	if (!m_target || !m_target->IsUnit())
+		return;
+
+	caster = static_cast< Unit* >(GetCaster());
+	if (!caster)
+		return;
+
+	ds = &caster->m_damageSplitTargets;
+	if (apply)
 	{
-		petOwner->DamageTakenPctMod[x] -= val;
-		m_target->DamageTakenPctMod[x] += val;
+		ds->m_flatDamageSplit = mod->m_miscValue;
+		ds->m_spellId = GetSpellProto()->Id;
+		ds->m_pctDamageSplit = 0;
+		ds->damage_type = mod->m_type;
+		ds->m_target = GetCaster()->GetGUID();
 	}
-	*/
+
+	ds->active = apply;
 }
 
 void Aura::SpellAuraModRegen(bool apply)
@@ -6650,38 +6608,6 @@ void Aura::SpellAuraModDetectedRange(bool apply)
 	{
 		TO_PLAYER( m_target )->DetectedRange -= mod->m_amount;
 	}
-}
-
-void Aura::SpellAuraSplitDamageFlat(bool apply)
-{
-	//DK:FIXME
-	//SUPA:FIXU
-
-	// rewrite, copy-paste DamageProc struct.
-	if(apply)
-	{
-		DamageSplitTarget ds;
-		ds.m_flatDamageSplit = mod->m_amount;
-		ds.m_spellId = GetSpellProto()->Id;
-		ds.m_pctDamageSplit = 0;
-		ds.damage_type = mod->m_miscValue;
-		ds.creator = (void*)this;
-		ds.m_target = GetCaster()->GetGUID();
-		m_target->m_damageSplitTargets.push_back(ds);
-		//sLog.outDebug("registering dmg split %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
-	}
-	else
-	{
-		for(std::list<struct DamageSplitTarget>::iterator i = m_target->m_damageSplitTargets.begin();i != m_target->m_damageSplitTargets.end();i++)
-		{
-			if(i->creator == this)
-			{
-				m_target->m_damageSplitTargets.erase(i);
-				break;
-			}
-		}
-	}
-
 }
 
 void Aura::SpellAuraModStealthLevel(bool apply)

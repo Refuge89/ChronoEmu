@@ -2415,40 +2415,15 @@ else
 //==========================================================================================
 //------------------------------- Special Effects Processing
 // Paladin: Blessing of Sacrifice, and Warlock: Soul Link
-		if( !pVictim->m_damageSplitTargets.empty() )
-		{
-			std::list< DamageSplitTarget >::iterator itr;
-			Unit * splittarget;
-			uint32 splitdamage, tmpsplit;
-			for( itr = pVictim->m_damageSplitTargets.begin() ; itr != pVictim->m_damageSplitTargets.end() ; itr ++ )
-			{
-				// TODO: Separate damage based on school.
-				splittarget = pVictim->GetMapMgr() ? pVictim->GetMapMgr()->GetUnit( itr->m_target ) : nullptr;
-				if( splittarget != nullptr && dmg.full_damage > 0 )
-				{
-					// calculate damage
-					tmpsplit = itr->m_flatDamageSplit;
-					if( tmpsplit > dmg.full_damage )
-						tmpsplit = dmg.full_damage; // prevent < 0 damage
-					splitdamage = tmpsplit;
-					dmg.full_damage -= tmpsplit;
-					tmpsplit = itr->m_pctDamageSplit * dmg.full_damage;
-					if( tmpsplit > dmg.full_damage )
-						tmpsplit = dmg.full_damage;
-					splitdamage += tmpsplit;
-					dmg.full_damage -= tmpsplit;
-					
-					// TODO: pct damage
-					if( splitdamage )
-					{
-						pVictim->DealDamage( splittarget , splitdamage , 0 , 0 , 0 , false );
-						// Send damage log
-						pVictim->SendSpellNonMeleeDamageLog( pVictim , splittarget , 27148 , splitdamage , SCHOOL_HOLY , 0 , 0 , true , 0 , 0 , true );
-					}
-				}
-			}
-			realdamage = dmg.full_damage;
-		}
+
+	if (pVictim->m_damageSplitTargets.active)
+	{
+		if (ability)
+			realdamage = pVictim->DoDamageSplitTarget(realdamage, ability->School, false);
+		else
+			realdamage = pVictim->DoDamageSplitTarget(realdamage, 0, true);
+	}
+
 //--------------------------special states processing---------------------------------------
 	
 	if(pVictim->GetTypeId() == TYPEID_PLAYER && TO_PLAYER(pVictim)->GodModeCheat == true)
@@ -5853,4 +5828,35 @@ void Unit::RemoveCustomEffect(uint8 effect)
 		if((*itr).second == 0)
 			CustomImmunityList.erase(itr);
 	}
+}
+
+uint32 Unit::DoDamageSplitTarget(uint32 res, uint32 school_type, bool melee_dmg)
+{
+	Unit* splittarget;
+	uint32 splitdamage, tmpsplit;
+	DamageSplitTarget * ds = &m_damageSplitTargets;
+
+	splittarget = (GetMapMgr() != nullptr) ? GetMapMgr()->GetUnit(ds->m_target) : nullptr;
+	if (splittarget != nullptr && res > 0)
+	{
+		// calculate damage
+		tmpsplit = ds->m_flatDamageSplit;
+		if (tmpsplit > res)
+			tmpsplit = res; // prevent < 0 damage
+		splitdamage = tmpsplit;
+		res -= tmpsplit;
+		tmpsplit = float2int32(ds->m_pctDamageSplit * res);
+		if (tmpsplit > res)
+			tmpsplit = res;
+		splitdamage += tmpsplit;
+		res -= tmpsplit;
+
+		if (splitdamage)
+		{
+			splittarget->DealDamage(splittarget, splitdamage, 0, 0, 0);
+			// Send log
+			SendSpellNonMeleeDamageLog(this, splittarget, ds->m_spellId, splitdamage, school_type, 0, 0, true, 0, 0, true);
+		}
+	}
+	return res;
 }
