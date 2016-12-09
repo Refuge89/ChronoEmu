@@ -9837,60 +9837,8 @@ void ApplyNormalFixes()
 			sp->EffectMiscValue[2] = 1;
 			sp->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
 		}			
+	}	
 
-		//////////////////////////////////////////
-		// OTHER								//
-		//////////////////////////////////////////
-	}
-	//Settings for special cases
-	QueryResult * resultx = WorldDatabase.Query("SELECT * FROM spell_coef_override");
-	if( resultx != nullptr )
-	{
-		uint32 spellid;
-		do 
-		{
-			Field * f;
-			f = resultx->Fetch();
-			spellid = f[0].GetUInt32();
-			SpellEntry * sp = dbcSpell.LookupEntryForced( spellid );
-			if( sp != nullptr )
-			{
-				sp->Dspell_coef_override = f[1].GetFloat();
-				sp->OTspell_coef_override = f[2].GetFloat();
-				sp->AP_coef_override = f[3].GetFloat();
-				sp->RAP_coef_override = f[4].GetFloat();
-			}
-			else
-			{
-				if(Config.MainConfig.GetBoolDefault("Server", "CleanDatabase", false))
-				{
-					WorldDatabase.Query("DELETE FROM spell_coef_override where id = '%u'", spellid);
-				}
-				Log.Warning("SpellCoefOverride", "Has nonexistant spell %u.", spellid);
-			}
-			spellid = 0;
-		} while( resultx->NextRow() );
-		delete resultx;
-	}
-
-	
-	/////////////////////////////////////////////////////////////////
-	//FORCER CREATURE SPELL TARGETING
-	//////////////////////////////////////////////////////////////////
-	QueryResult * resultfcst = WorldDatabase.Query("SELECT * FROM spell_forced_targets");
-	if( resultfcst != nullptr )
-	{
-		do 
-		{
-			Field * f;
-			f = resultfcst->Fetch();
-			sp = dbcSpell.LookupEntryForced( f[0].GetUInt32() );
-			if( sp )
-				sp->forced_creature_target = f[1].GetUInt32();
-			} while( resultfcst->NextRow() );
-		delete resultfcst;
-	}
-	
 	//Fully loaded coefficients, we must share channeled coefficient to its triggered spells
 	for(uint32 x=0; x < cnt; x++)
 	{

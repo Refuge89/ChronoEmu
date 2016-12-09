@@ -4,7 +4,7 @@
 
 #include "StdAfx.h"
 
-initialiseSingleton( World );
+initialiseSingleton(World);
 
 DayWatcherThread* dw = nullptr;
 CharacterLoaderThread* ctl = nullptr;
@@ -402,7 +402,6 @@ bool World::SetInitialWorldSettings()
 
 	tl.wait();
 
-	//Apply112SpellFixes();
 	ApplyExtraDataFixes();
 	ApplyNormalFixes();
 
@@ -414,6 +413,8 @@ bool World::SetInitialWorldSettings()
 	MAKE_TASK(ObjectMgr, LoadVendors);
 	MAKE_TASK(ObjectMgr, LoadAIThreatToSpellId);
 	MAKE_TASK(ObjectMgr, LoadSpellFixes);
+	MAKE_TASK(ObjectMgr, LoadSpellCoefOverride);
+	MAKE_TASK(ObjectMgr, LoadSpellForcedTargets);
 	MAKE_TASK(ObjectMgr, LoadDefaultPetSpells);
 	MAKE_TASK(ObjectMgr, LoadPetSpellCooldowns);
 	MAKE_TASK(ObjectMgr, LoadGuildCharters);

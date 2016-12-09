@@ -1252,64 +1252,71 @@ void ObjectMgr::LoadSpellProcs()
 	}	
 }
 
-void ObjectMgr::LoadSpellEffectsOverride()
+//
+//FORCED CREATURE SPELL TARGETING
+//
+void ObjectMgr::LoadSpellForcedTargets()
 {
 	SpellEntry* sp;
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_effects_override");
-	if(result)
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_forced_targets");
+	if (result)
 	{
 		do
 		{
 			Field * f = result->Fetch();
-			uint32 seo_SpellId = f[0].GetUInt32();
-			uint32 seo_EffectId = f[1].GetUInt32();
-			uint32 seo_Disable = f[2].GetUInt32();
-			uint32 seo_Effect = f[3].GetUInt32();
-			uint32 seo_BasePoints = f[4].GetUInt32();
-			uint32 seo_ApplyAuraName = f[5].GetUInt32();
-			uint32 seo_SpellGroupRelation = f[6].GetUInt32();
-			uint32 seo_MiscValue = f[7].GetUInt32();
-			uint32 seo_TriggerSpell = f[8].GetUInt32();
-			uint32 seo_ImplicitTargetA = f[9].GetUInt32();
-			uint32 seo_ImplicitTargetB = f[10].GetUInt32();
+			uint32 spellid = f[0].GetUInt32();
+			uint32 forcedtarget = f[1].GetUInt32();
 
-			if( seo_SpellId )
+			if (spellid)
 			{
-				sp = dbcSpell.LookupEntryForced( seo_SpellId );
-				if( sp != nullptr )
+				sp = dbcSpell.LookupEntryForced(spellid);
+				if (sp != nullptr)
 				{
-					if( seo_Disable )
-						sp->Effect[seo_EffectId] = 0;
-
-					if( seo_Effect )
-						sp->Effect[seo_EffectId] = seo_Effect;
-
-					if( seo_BasePoints )
-						sp->EffectBasePoints[seo_EffectId] = seo_BasePoints;
-
-					if( seo_ApplyAuraName )
-						sp->EffectApplyAuraName[seo_EffectId] = seo_ApplyAuraName;
-
-					if( seo_SpellGroupRelation )
-						sp->EffectSpellGroupRelation[seo_EffectId] = seo_SpellGroupRelation;
-
-					if( seo_MiscValue )
-						sp->EffectMiscValue[seo_EffectId] = seo_MiscValue;
-
-					if( seo_TriggerSpell )
-						sp->EffectTriggerSpell[seo_EffectId] = seo_TriggerSpell;
-					
-					if( seo_ImplicitTargetA )
-						sp->EffectImplicitTargetA[seo_EffectId] = seo_ImplicitTargetA;
-
-					if( seo_ImplicitTargetB )
-						sp->EffectImplicitTargetB[seo_EffectId] = seo_ImplicitTargetB;
+					if (forcedtarget)
+						sp->forced_creature_target = forcedtarget;
 				}
 			}
-
-		}while(result->NextRow());
+		} while (result->NextRow());
 		delete result;
-	}	
+	}
+}
+
+//
+// Settings for special cases
+//
+void ObjectMgr::LoadSpellCoefOverride()
+{
+	SpellEntry* sp;
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_coef_override");
+	if (result)
+	{
+		do
+		{
+			Field * f = result->Fetch();
+			uint32 spellid = f[0].GetUInt32();
+			uint32 DSpellOverride = f[1].GetFloat();
+			uint32 OTSpellOverride = f[2].GetFloat();
+			uint32 APSpellOverride = f[3].GetFloat();
+			uint32 RAPSpellOverride= f[4].GetFloat();
+			
+			if (spellid)
+			{
+				sp = dbcSpell.LookupEntryForced(spellid);
+				if (sp != nullptr)
+				{
+					if (DSpellOverride)
+						sp->Dspell_coef_override = DSpellOverride;
+					if (OTSpellOverride)
+						sp->OTspell_coef_override = OTSpellOverride;
+					if (APSpellOverride)
+						sp->AP_coef_override = APSpellOverride;
+					if (RAPSpellOverride)
+						sp->RAP_coef_override = RAPSpellOverride;
+				}
+			}
+		} while (result->NextRow());
+		delete result;
+	}
 }
 
 Item * ObjectMgr::CreateItem(uint32 entry,Player * owner)
@@ -1545,8 +1552,6 @@ void ObjectMgr::LoadTrainers()
 	Field * fields2;
 	const char * temp;
 	size_t len;
-
-	LoadDisabledSpells();
 
 	if(!result)
 		return;
@@ -2604,36 +2609,6 @@ bool ObjectMgr::HandleInstanceReputationModifiers(Player * pPlayer, Unit * pVict
 	}
 
 	return true;
-}
-
-void ObjectMgr::LoadDisabledSpells()
-{
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_disable");
-	if(result)
-	{
-		do 
-		{
-			m_disabled_spells.insert( result->Fetch()[0].GetUInt32() );
-		} while(result->NextRow());
-		delete result;
-	}
-
-	Log.Notice("ObjectMgr", "%u disabled spells.", m_disabled_spells.size());
-}
-
-void ObjectMgr::ReloadLoadDisabledSpells()
-{
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_disable");
-	if(result)
-	{
-		do 
-		{
-			m_disabled_spells.clear();
-			m_disabled_spells.insert( result->Fetch()[0].GetUInt32() );
-		} while(result->NextRow());
-		delete result;
-	}
-	Log.Notice("ObjectMgr", "%u disabled spells.", m_disabled_spells.size());
 }
 
 void ObjectMgr::LoadGroups()

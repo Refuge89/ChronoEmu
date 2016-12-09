@@ -115,20 +115,14 @@ void WardenBase::Update()
 		{
 			// 1.5 minutes after send packet
 			if ((m_WardenKickTimer > 90 * IN_MILLISECONDS) && sWorld.m_WardenEnabled)
-			{
 				Client->GetPlayer()->Kick();
-			}
 			else
-			{
 				m_WardenKickTimer += diff;
-			}
 		}
 		else if (m_WardenCheckTimer > 0)
 		{
 			if (diff >= m_WardenCheckTimer)
-			{
 				RequestData();
-			}
 			else
 				m_WardenCheckTimer -= diff;
 		}
