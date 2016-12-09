@@ -21,10 +21,10 @@
 Mutex m_transportGuidGen;
 uint32 m_transportGuidMax = 50;
 
-bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, int32 Time)
+bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name)
 {
 	// Lookup GameobjectInfo
-	if(!CreateFromProto(EntryID,0,0,0,0,0))
+	if (!CreateFromProto(EntryID, 0, 0.0f, 0.0f, 0.0f, 0.0f))
 		return false;
 	
 	SetUInt32Value(GAMEOBJECT_FLAGS,40);
@@ -271,6 +271,7 @@ bool Transporter::GenerateWaypoints()
     mNextWaypoint = GetNextWaypoint();
     m_pathTime = timer;
     m_timer = 0;
+	m_period = t;
     return true;
 }
 
@@ -396,7 +397,7 @@ void ObjectMgr::LoadTransporters()
 	return;
 #endif
 	Log.Notice("ObjectMgr", "Loading Transports...");
-	QueryResult * QR = WorldDatabase.Query("SELECT * FROM transport_data");
+	QueryResult * QR = WorldDatabase.Query("SELECT entry FROM gameobject_names WHERE type = %u", GAMEOBJECT_TYPE_MO_TRANSPORT);
 	if(!QR) return;
 
 	int64 total = QR->GetRowCount();
@@ -404,12 +405,11 @@ void ObjectMgr::LoadTransporters()
 	do 
 	{
 		uint32 entry = QR->Fetch()[0].GetUInt32();
-		int32 period = QR->Fetch()[2].GetInt32();
 
 		Transporter * pTransporter = new Transporter((uint64)HIGHGUID_TYPE_TRANSPORTER<<32 |entry);
-		if(!pTransporter->CreateAsTransporter(entry, "", period))
+		if(!pTransporter->CreateAsTransporter(entry, ""))
 		{
-			sLog.outError("Transporter %s failed creation for some reason.", QR->Fetch()[1].GetString());
+			sLog.outError("Transporter %s failed creation for some reason.", entry);
 			delete pTransporter;
 		}else
 		{

@@ -66,8 +66,8 @@ void Guild::AddNewGuildMember(Player *plyr)
 	gMember->Rank = plyr->GetGuildRank();
 	gMember->lastLevel =plyr->getLevel();
 	gMember->lastZone =plyr->GetZoneId();
-	gMember->publicNote = NULL;
-	gMember->officerNote = NULL;
+	gMember->publicNote = nullptr;
+	gMember->officerNote = nullptr;
 	gMember->lastOnline = UNIXTIME;
 
 	AddGuildMember(gMember);
@@ -282,66 +282,7 @@ void Guild::SetOfficerNote(uint64 guid, std::string officerNote)
 		}
 	}
 }
-/*
-void Guild::UpdateTabard()
-{
-std::list<PlayerInfo*>::iterator i;
-for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i;) 
-{
-Player *pl = objmgr.GetPlayer( i->guid );
-if (pl)
-{
-uint64 TabardGuid = pl->GetUInt64Value();
-}
-}
 
-//UpdateData *data = new UpdateData;
-//data->BuildPacket()*/
-/*	CUpdateBlock block;
-char updateBuf[0x80];
-int size;
-char *ptr;
-map<string, unsigned long>::iterator i;
-for(i = Members.begin();i != Members.end();i++)
-{
-CPlayer *pPlayer = NULL;
-if(!DataManager.RetrieveObject((CWoWObject**)&pPlayer, OBJ_PLAYER, i->second))
-{
-#ifdef _DEBUG
-Debug.Log("CGuild::UpdateTabard() - Unable to retrieve an object found in the member list.");
-#endif
-continue;
-}
-
-pPlayer->Data.GuildTimestamp++;
-if(pPlayer->pClient != NULL)
-{
-block.ResetBlock(updateBuf, 0x80);
-block.AddDataUpdate(PLAYER_MAX_BITS, pPlayer->guid, PLAYERGUID_HIGH);
-block.Add(PLAYER_GUILD_TIMESTAMP, pPlayer->Data.GuildTimestamp);
-if(pPlayer->Data.Items[SLOT_TABARD] != 0)
-block.Add(PLAYER_INV_SLOTS+SLOT_TABARD*2, 0,0);
-
-ptr = block.GetCompressedData(size);
-if(size)
-{
-pPlayer->pClient->RegionOutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, ptr, size);
-}
-if(pPlayer->Data.Items[SLOT_TABARD] != 0)
-{
-block.ResetBlock(updateBuf, 0x80);
-block.AddDataUpdate(PLAYER_MAX_BITS, pPlayer->guid, PLAYERGUID_HIGH);
-block.Add(PLAYER_INV_SLOTS+SLOT_TABARD*2, pPlayer->Data.Items[SLOT_TABARD], ITEMGUID_HIGH);
-ptr = block.GetCompressedData(size);
-if(size)
-{
-pPlayer->pClient->RegionOutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, ptr, size);
-}
-}
-}
-}
-}
-*/
 void Guild::CreateRank(std::string name,uint32 rights)
 {
 	if(m_rankList.size() >= MAX_GUILD_RANKS)
