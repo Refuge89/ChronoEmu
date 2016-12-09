@@ -105,12 +105,11 @@ void CapitalizeString(string& arg)
 
 void WorldSession::CharacterEnumProc(QueryResult * result)
 {
-
 }
 
 void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
-    QueryResult* result = CharacterDatabase.Query("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags, guild_data.guildid FROM characters LEFT JOIN guild_data ON characters.guid = guild_data.playerid WHERE acct=%u ORDER BY guid LIMIT 10", GetAccountId());
+	QueryResult* result = CharacterDatabase.Query("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags FROM characters WHERE acct=%u ORDER BY guid LIMIT 10", GetAccountId());
 
 	// should be more than enough.. 200 bytes per char..
 	WorldPacket data(SMSG_CHAR_ENUM, (result ? result->GetRowCount() * 200 : 1));	
@@ -118,28 +117,28 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 	data << num;
     if( result )
     {
-	Player *plr;
-    uint32 guid;
-    Field *fields;
-        do
-        {
-        fields = result->Fetch();
-        guid = fields[0].GetUInt32();
+	     Player *plr;
+         uint32 guid;
+         Field *fields;
+         do
+         {
+              fields = result->Fetch();
+              guid = fields[0].GetUInt32();
 			
-            plr = objmgr.GetPlayer(guid);
-            if(plr)
-            {
-                // we already have that player in world... for some strange reason...
-                continue;
-            }
+              plr = objmgr.GetPlayer(guid);
+              if(plr)
+              {
+                  // we already have that player in world... for some strange reason...
+                   continue;
+              }
 
-            plr = new Player(HIGHGUID_TYPE_PLAYER);
-            ASSERT(plr);
-            plr->SetSession(this);
+              plr = new Player(HIGHGUID_TYPE_PLAYER);
+              ASSERT(plr);
+              plr->SetSession(this);
 			
-            //plr->LoadFromDB( guid );
-			plr->LoadFromDB_Light( fields, guid );
-			plr->BuildEnumData(result, &data);
+              //plr->LoadFromDB( guid );
+			  plr->LoadFromDB_Light( fields, guid );
+			  plr->BuildEnumData(result, &data);
 
             num++;			
 		}	
@@ -276,13 +275,12 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pn->cl = pNewChar->getClass();
 	pn->race = pNewChar->getRace();
 	pn->gender = pNewChar->getGender();
+	pn->publicNote = nullptr;
+	pn->officerNote = nullptr;
 	pn->m_Group=0;
 	pn->subGroup=0;
 	pn->m_loggedInPlayer=nullptr;
 	pn->team = pNewChar->GetTeam ();
-	pn->guild=nullptr;
-	pn->guildRank=nullptr;
-	pn->guildMember=nullptr;
 	objmgr.AddPlayerInfo(pn);
 
 	pNewChar->ok_to_remove = true;
@@ -396,19 +394,12 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		PlayerInfo * inf = objmgr.GetPlayerInfo((uint32)guid);
 		if( inf != nullptr && inf->m_loggedInPlayer == nullptr )
 		{
-			QueryResult * result = CharacterDatabase.Query("SELECT name FROM characters WHERE guid = %u AND acct = %u", (uint32)guid, _accountId);
+			QueryResult * result = CharacterDatabase.Query("SELECT guildid, name FROM characters WHERE guid = %u", (uint32)guid, _accountId);
 			if(!result)
 				return;
 
-			if(inf->guild)
-			{
-				if(inf->guild->GetGuildLeader()==inf->guid)
-					inf->guild->Disband();
-				else
-					inf->guild->RemoveGuildMember(inf,nullptr);
-			}
-
-			string name = result->Fetch()[0].GetString();
+			uint32 guildid = result->Fetch()[0].GetUInt32();
+			string name = result->Fetch()[1].GetString();
 			delete result;
 
 			for(int i = 0; i < NUM_CHARTER_TYPES; ++i)
@@ -588,21 +579,15 @@ void WorldSession::FullLogin(Player * plr)
 		info->lastLevel = plr->getLevel();
 		info->lastOnline = UNIXTIME;
 		info->lastZone = plr->GetZoneId();
+		info->officerNote = NULL;
+		info->publicNote = NULL;
 		info->race = plr->getRace();
 		info->team = plr->GetTeam();
-		info->guild=nullptr;
-		info->guildRank=nullptr;
-		info->guildMember=nullptr;
 		info->m_Group=0;
 		info->subGroup=0;
 		objmgr.AddPlayerInfo(info);
 	}
 	plr->m_playerInfo = info;
-	if(plr->m_playerInfo->guild)
-	{
-		plr->m_uint32Values[PLAYER_GUILDID] = plr->m_playerInfo->guild->GetGuildId();
-		plr->m_uint32Values[PLAYER_GUILDRANK] = plr->m_playerInfo->guildRank->iId;
-	}
 
 	info->m_loggedInPlayer = plr;
 
@@ -694,20 +679,22 @@ void WorldSession::FullLogin(Player * plr)
 	//Issue a message telling all guild members that this player has signed on
 	if(plr->IsInGuild())
 	{
-		Guild *pGuild = plr->m_playerInfo->guild;
+		Guild *pGuild = objmgr.GetGuild(plr->GetGuildId());
 		if(pGuild)
 		{
 			WorldPacket data(50);
 			data.Initialize(SMSG_GUILD_EVENT);
 			data << uint8(GUILD_EVENT_MOTD);
 			data << uint8(0x01);
-			if(pGuild->GetMOTD())
-				data << pGuild->GetMOTD();
-			else
-				data << uint8(0);
+			data << pGuild->GetGuildMotd();
 			SendPacket(&data);
 
-			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
+			data.Initialize(SMSG_GUILD_EVENT);
+			data << uint8(GUILD_EVENT_HASCOMEONLINE);
+			data << uint8(0x01);
+			data << plr->GetName();
+			data << plr->GetGUID();
+			pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
 		}
 	}
 

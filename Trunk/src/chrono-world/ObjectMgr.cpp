@@ -173,6 +173,10 @@ ObjectMgr::~ObjectMgr()
 	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
 	{
 		itr->second->m_Group=nullptr;
+		if(itr->second->publicNote)
+			free(itr->second->publicNote);
+		if(itr->second->officerNote)
+			free(itr->second->officerNote);
 		free(itr->second->name);
 		delete itr->second;
 	}
@@ -240,13 +244,10 @@ void ObjectMgr::DeletePlayerInfo( uint32 guid )
 		pl->m_Group = nullptr;
 	}
 
-	if(pl->guild)
-	{
-		if(pl->guild->GetGuildLeader()==pl->guid)
-			pl->guild->Disband();
-		else
-			pl->guild->RemoveGuildMember(pl,nullptr);
-	}
+	if(pl->officerNote)
+		free(pl->officerNote);
+	if(pl->publicNote)
+		free(pl->publicNote);
 
 	string pnam = string(pl->name);
 	ASCENT_TOLOWER(pnam);
@@ -327,7 +328,7 @@ skilllinespell* ObjectMgr::GetSpellSkill(uint32 id)
 void ObjectMgr::LoadPlayersInfo()
 {
 	PlayerInfo * pn;
-	QueryResult *result = CharacterDatabase.Query("SELECT guid,name,race,class,level,gender,zoneId,timestamp,acct FROM characters");
+	QueryResult *result = CharacterDatabase.Query("SELECT guid,name,race,class,level,gender,zoneId,timestamp,publicNote,officerNote,guildRank,acct FROM characters");
 	uint32 period, c;
 	if(result)
 	{
@@ -345,13 +346,19 @@ void ObjectMgr::LoadPlayersInfo()
 			pn->gender = fields[5].GetUInt8();
 			pn->lastZone=fields[6].GetUInt32();
 			pn->lastOnline=fields[7].GetUInt32();
-			pn->acct = fields[8].GetUInt32();
+			//pn->publicNote=fields[8].GetString();
+			//pn->officerNote= fields[9].GetString();
+			pn->publicNote=pn->officerNote=nullptr;
+			if(strlen(fields[8].GetString()) > 1)
+				pn->publicNote = strdup(fields[8].GetString());
+			if(strlen(fields[9].GetString()) > 1)
+				pn->officerNote = strdup(fields[9].GetString());
+
+			pn->Rank=fields[10].GetUInt32();
+			pn->acct = fields[11].GetUInt32();
 			pn->m_Group=0;
 			pn->subGroup=0;
 			pn->m_loggedInPlayer=nullptr;
-			pn->guild=nullptr;
-			pn->guildRank=nullptr;
-			pn->guildMember=nullptr;
 
 			if(pn->race==RACE_HUMAN||pn->race==RACE_DWARF||pn->race==RACE_GNOME||pn->race==RACE_NIGHTELF)
 				pn->team = 0;
@@ -521,28 +528,71 @@ void ObjectMgr::LoadPlayerCreateInfo()
 // DK:LoadGuilds()
 void ObjectMgr::LoadGuilds()
 {
-	QueryResult *result = CharacterDatabase.Query( "SELECT * FROM guilds" );
-	if(result)
 	{
-		uint32 period = (result->GetRowCount() / 20) + 1;
-		uint32 c = 0;
-		do 
+		QueryResult *result = CharacterDatabase.Query("SELECT * FROM guilds");
+		QueryResult *result2;
+		QueryResult *result3;
+
+		if (!result)
 		{
-			Guild * pGuild = Guild::Create();
-			if(!pGuild->LoadFromDB(result->Fetch()))
+			return;
+		}
+
+		Guild *pGuild;
+		struct RankInfo rankList;
+
+		do
+		{
+			Field *fields = result->Fetch();
+
+			pGuild = new Guild;
+
+			pGuild->SetGuildId(fields[0].GetUInt32());
+			pGuild->SetGuildName(fields[1].GetString());
+			pGuild->SetGuildLeaderGuid(fields[2].GetUInt64());
+			pGuild->SetGuildEmblemStyle(fields[3].GetUInt32());
+			pGuild->SetGuildEmblemColor(fields[4].GetUInt32());
+			pGuild->SetGuildBorderStyle(fields[5].GetUInt32());
+			pGuild->SetGuildBorderColor(fields[6].GetUInt32());
+			pGuild->SetGuildBackgroundColor(fields[7].GetUInt32());
+			pGuild->SetGuildInfo(fields[8].GetString());
+			pGuild->SetGuildMotd(fields[9].GetString());
+
+			result2 = CharacterDatabase.Query("SELECT guid FROM characters WHERE guildId=%u", pGuild->GetGuildId());
+			if (result2)
 			{
-				delete pGuild;
+				do
+				{
+					PlayerInfo *pi = objmgr.GetPlayerInfo(result2->Fetch()->GetUInt32());
+					if (pi)
+						pGuild->AddGuildMember(pi);
+				} while (result2->NextRow());
+				delete result2;
 			}
-			else
-				mGuild.insert(make_pair(pGuild->GetGuildId(), pGuild));
 
-			if( !((++c) % period) )
-				Log.Notice("Guilds", "Done %u/%u, %u%% complete.", c, result->GetRowCount(), float2int32( (float(c) / float(result->GetRowCount()))*100.0f ));
+			result3 = CharacterDatabase.Query("SELECT * FROM guild_ranks WHERE guildId=%u ORDER BY rankId", pGuild->GetGuildId());
+			if (result3)
+			{
+				do
+				{
+					Field *fields3 = result3->Fetch();
 
-		} while(result->NextRow());
+					rankList.name = fields3[2].GetString();
+					rankList.rights = fields3[3].GetUInt32();
+
+					pGuild->CreateRank(rankList.name, rankList.rights);
+				} while (result3->NextRow());
+				delete result3;
+			}
+			pGuild->LoadGuildCreationDate();
+
+			AddGuild(pGuild);
+
+		} while (result->NextRow());
+
 		delete result;
+		Log.Notice("ObjectMgr", "%u guilds loaded.", mGuild.size());
 	}
-	Log.Notice("ObjectMgr", "%u guilds loaded.", mGuild.size());
 }
 
 Corpse* ObjectMgr::LoadCorpse(uint32 guid)
@@ -728,13 +778,6 @@ void ObjectMgr::SetHighestGuids()
 		delete result;
 	}
 
-	result = CharacterDatabase.Query("SELECT MAX(guildId) FROM guilds");
-	if(result)
-	{
-		m_hiGuildId = result->Fetch()[0].GetUInt32();
-		delete result;
-	}
-
 	Log.Notice("ObjectMgr", "HighGuid(CORPSE) = %u", m_hiCorpseGuid);
 	Log.Notice("ObjectMgr", "HighGuid(PLAYER) = %u", m_hiPlayerGuid);
 	Log.Notice("ObjectMgr", "HighGuid(GAMEOBJ) = %u", m_hiGameObjectSpawnId);
@@ -743,7 +786,6 @@ void ObjectMgr::SetHighestGuids()
 	Log.Notice("ObjectMgr", "HighGuid(CONTAINER) = %u", m_hiContainerGuid);
 	Log.Notice("ObjectMgr", "HighGuid(GROUP) = %u", m_hiGroupId);
 	Log.Notice("ObjectMgr", "HighGuid(CHARTER) = %u", m_hiCharterId);
-	Log.Notice("ObjectMgr", "HighGuid(GUILD) = %u", m_hiGuildId);
 }
 
 
@@ -988,6 +1030,7 @@ bool ObjectMgr::RemoveGuild(uint32 guildId)
 	}
 
 
+	i->second->RemoveFromDb();
 	mGuild.erase(i);
 	return true;
 }
@@ -1005,7 +1048,7 @@ Guild* ObjectMgr::GetGuildByLeaderGuid(uint64 leaderGuid)
 	GuildMap::const_iterator itr;
 	for (itr = mGuild.begin();itr != mGuild.end(); itr++)
 	{
-		if( itr->second->GetGuildLeader() == leaderGuid )
+		if (itr->second->GetGuildLeaderGuid() == leaderGuid)
 			return itr->second;
 	}
 	return nullptr;

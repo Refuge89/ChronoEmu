@@ -557,6 +557,7 @@ protected:
 	void HandleCharterSign(WorldPacket &recv_data);
 	void HandleCharterRename(WorldPacket & recv_data);
 	void HandleSetGuildInformation(WorldPacket & recv_data);
+	void SendGuildCommandResult(uint32 typecmd, const char *  str, uint32 cmdresult);
 
 	// Pet
 	void HandlePetAction(WorldPacket & recv_data);

@@ -750,13 +750,16 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 	return true;
 }
 
+//
+// REMOVE THIS COMMAND
+//
 bool ChatHandler::HandleGuildSetLeaderCommand(const char *args, WorldSession *m_session)
 {
-	Player *plr = getSelectedChar(m_session);
+	/*Player *plr = getSelectedChar(m_session);
 	if( plr == nullptr )
 		return true;
 
-	if( plr->m_playerInfo->guild == nullptr )
+	if( plr->m_playerInfo->m == nullptr )
 	{
 		SystemMessage(m_session, "Target not in a guild.");
 		return true;
@@ -771,6 +774,6 @@ bool ChatHandler::HandleGuildSetLeaderCommand(const char *args, WorldSession *m_
 
 	Guild *pGuild = plr->m_playerInfo->guild;
 	pGuild->ChangeGuildMaster(new_leader, nullptr);
-	SystemMessage(m_session, "Guild leader changed.");
+	SystemMessage(m_session, "Guild leader changed.");*/
 	return true;
 }

@@ -28,7 +28,6 @@ class GameObject;
 class Transporter;
 class Corpse;
 class Guild;
-struct GuildRank;
 class Pet;
 class Charter;
 struct LevelInfo;
@@ -513,7 +512,10 @@ struct PlayerInfo
 	uint32 gender;
 	uint32 cl;
 	uint32 team;
-	
+
+	uint32 Rank;
+	char * publicNote;
+	char * officerNote;
 	time_t lastOnline;
 	uint32 lastZone;
 	uint32 lastLevel;
@@ -521,9 +523,6 @@ struct PlayerInfo
 	int8 subGroup;
 
 	Player * m_loggedInPlayer;
-	Guild * guild;
-	GuildRank * guildRank;
-	GuildMember * guildMember;
 };
 struct PlayerPet
 {
@@ -749,10 +748,6 @@ public:
 
 	Player ( uint32 guid );
 	~Player ( );
-
-	CHRONO_INLINE Guild * GetGuild() { return m_playerInfo->guild; }
-	CHRONO_INLINE GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
-	CHRONO_INLINE GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
 
 	void EventGroupFullUpdate();
 
@@ -1070,12 +1065,12 @@ public:
     /************************************************************************/
 	CHRONO_INLINE  bool        IsInGuild() {return (m_uint32Values[PLAYER_GUILDID] != 0) ? true : false;}
 	CHRONO_INLINE uint32       GetGuildId() { return m_uint32Values[PLAYER_GUILDID]; }
-	void                SetGuildId(uint32 guildId);
+	void                       SetGuildId(uint32 guildId);
 	CHRONO_INLINE uint32       GetGuildRank() { return m_uint32Values[PLAYER_GUILDRANK]; }
-	void                SetGuildRank(uint32 guildRank);
-	uint32              GetGuildInvitersGuid() { return m_invitersGuid; }
-	void                SetGuildInvitersGuid( uint32 guid ) { m_invitersGuid = guid; }
-	void                UnSetGuildInvitersGuid() { m_invitersGuid = 0; }
+	void                       SetGuildRank(uint32 guildRank) { SetUInt32Value(PLAYER_GUILDRANK, guildRank); }
+	uint32                     GetGuildInvitersGuid() { return m_invitersGuid; }
+	void                       SetGuildInvitersGuid( uint32 guid ) { m_invitersGuid = guid; }
+	void                       UnSetGuildInvitersGuid() { m_invitersGuid = 0; }
   
     /************************************************************************/
     /* Duel                                                                 */
@@ -1303,6 +1298,7 @@ public:
 
     //Showing Units WayPoints
 	AIInterface* waypointunit;
+	void SaveGuild();
 	
 	uint32 m_nextSave;
 	//Tutorials
@@ -1659,6 +1655,7 @@ public:
 		SafeTeleport(MapID, InstanceID, vec);
 	}
 
+	Guild * myGuild;
 	/*****************
 	  PVP Stuff
 	******************/
@@ -1797,6 +1794,7 @@ public:
 	void save_Misc();
 	void save_PositionHP();
 	void save_BindPosition();
+	void save_GuildData();
 	void save_Honor();
 	void save_EntryPoint();
 	void save_Taxi();
@@ -1881,6 +1879,7 @@ protected:
 	void _SaveQuestLogEntry(QueryBuffer * buf);
 	void _LoadQuestLogEntry(QueryResult * result);
 
+	void _LoadGuild();
 	void _LoadPet(QueryResult * result);
 	void _LoadPetNo();
 	void _LoadPetSpells(QueryResult * result);

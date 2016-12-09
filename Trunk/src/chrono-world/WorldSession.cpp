@@ -66,9 +66,6 @@ WorldSession::~WorldSession()
 	if(permissions)
 		delete [] permissions;
 
-	if (m_Warden)
-		delete m_Warden;
-	
 	WorldPacket *packet;
 
 	while((packet = _recvQueue.Pop()))
@@ -303,9 +300,18 @@ void WorldSession::LogoutPlayer(bool Save)
 		//Issue a message telling all guild members that this player signed off
 		if( _player->IsInGuild() )
 		{
-			Guild* pGuild = _player->m_playerInfo->guild;
+			Guild *pGuild = objmgr.GetGuild(_player->GetGuildId());
 			if( pGuild != nullptr )
-				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName() );
+			{
+				//Update Offline info
+				pGuild->GuildMemberLogoff(_player);
+				WorldPacket data(SMSG_GUILD_EVENT, 11+strlen(_player->GetName()));
+				data << uint8(GUILD_EVENT_HASGONEOFFLINE);
+				data << uint8(0x01);
+				data << _player->GetName();
+				data << _player->GetGUID();
+				pGuild->SendMessageToGuild(0,&data,G_MSGTYPE_ALL);
+			}
 		}
 
 		_player->GetItemInterface()->EmptyBuyBack();

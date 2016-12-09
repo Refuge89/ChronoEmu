@@ -303,6 +303,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	linkTarget			  = 0;
 	stack_cheat			 = false;
 	triggerpass_cheat = false;
+	myGuild               = 0;
 	m_pvpTimer			  = 0;
 	m_globalCooldown = 0;
 	m_lastHonorResetTime	= 0;
@@ -1340,7 +1341,7 @@ void Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     *p_data << fields[9].GetFloat();                       // y
     *p_data << fields[10].GetFloat();                       // z
 
-    *p_data << uint32(fields[18].GetUInt32());              // guild id
+    *p_data << uint32(fields[51].GetUInt32());              // guild id
 
 	uint32 char_flags = 0;
     uint32 playerFlags = fields[17].GetUInt32();
@@ -2072,9 +2073,32 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 
 	<< m_talentresettimes	   << ", "
 	<< m_FirstLogin			 << ", "
-	<< rename_pending
-	<< "," << m_arenaPoints << ","
+		<< rename_pending;
+
+	Guild *pGuild;
+	PlayerInfo *   pMember;
+
+	if (GetGuildId() && (pGuild = objmgr.GetGuild(GetGuildId())) && (pMember = pGuild->GetGuildMember(GetGUID())))
+	{
+		if (pMember->publicNote)
+			ss << ",'" << CharacterDatabase.EscapeString(pMember->publicNote) << "','";
+		else
+			ss << ",'','";
+
+		if (pMember->officerNote)
+			ss << CharacterDatabase.EscapeString(pMember->officerNote) << "'," << GetGuildId() << "," << GetGuildRank();
+		else
+			ss << "'," << GetGuildId() << "," << GetGuildRank();
+
+	}
+	else
+	{
+		ss << ",'','',0,0";
+	}
+
+	ss << "," << m_arenaPoints << ","
 		<< (uint32)m_StableSlotCount << ",";
+
 	
 	// instances
 	ss << m_instanceId		   << ", ";
@@ -2628,6 +2652,12 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	m_talentresettimes = get_next_field.GetUInt32();
 	m_FirstLogin = get_next_field.GetBool();
 	rename_pending = get_next_field.GetBool();
+	field_index++;
+	field_index++;	
+	//uint32 guildid = get_next_field.GetUInt32();
+	//uint32 guildrank = get_next_field.GetUInt32();
+	SetGuildId(get_next_field.GetUInt32());
+	SetUInt32Value(PLAYER_GUILDRANK,get_next_field.GetUInt32());
 	m_arenaPoints = get_next_field.GetUInt32();
 	for(uint32 z = 0; z < NUM_CHARTER_TYPES; ++z)
 		m_charters[z] = objmgr.GetCharterByGuid(GetGUID(), (CharterTypes)z);
@@ -7331,30 +7361,8 @@ void Player::SafeTeleport(MapMgr * mgr, const LocationVector & vec)
 
 void Player::SetGuildId(uint32 guildId)
 {
-	if(IsInWorld())
-	{
-		const uint32 field = PLAYER_GUILDID;
-		sEventMgr.AddEvent(((Object*)this), &Object::EventSetUInt32Value, field, guildId, EVENT_PLAYER_SEND_PACKET, 1,
-			1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-	}
-	else
-	{
-		SetUInt32Value(PLAYER_GUILDID,guildId);
-	}
-}
-
-void Player::SetGuildRank(uint32 guildRank)
-{
-	if(IsInWorld())
-	{
-		const uint32 field = PLAYER_GUILDRANK;
-		sEventMgr.AddEvent(((Object*)this), &Object::EventSetUInt32Value, field, guildRank, EVENT_PLAYER_SEND_PACKET, 1,
-			1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-	}
-	else
-	{
-		SetUInt32Value(PLAYER_GUILDRANK,guildRank);
-	}
+	myGuild = guildId ? objmgr.GetGuild(guildId) : 0;
+    SetUInt32Value(PLAYER_GUILDID,guildId);
 }
 
 void Player::UpdatePvPArea()

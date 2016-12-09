@@ -1637,10 +1637,10 @@ void World::PollCharacterInsertQueue(DatabaseConnection * con)
 			inf->lastZone = 0;
 			inf->m_Group=nullptr;
 			inf->m_loggedInPlayer=nullptr;
-			inf->guild=nullptr;
-			inf->guildRank=nullptr;
-			inf->guildMember=nullptr;
+			inf->officerNote = nullptr;
+			inf->publicNote = nullptr;
 			inf->race=f[3].GetUInt32();
+			inf->Rank = 0;
 			inf->subGroup=0;
 			switch(inf->race)
 			{
