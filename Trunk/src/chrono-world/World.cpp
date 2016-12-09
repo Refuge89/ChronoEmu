@@ -282,9 +282,6 @@ bool World::SetInitialWorldSettings()
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
 	CharacterDatabase.WaitExecute("UPDATE characters SET banned=0,banReason='' WHERE banned > 100 AND banned < %u", UNIXTIME);
 
-	Log.Notice("World", "Clearing old guild logs...");
-	CharacterDatabase.WaitExecute("DELETE FROM guild_logs WHERE timestamp <= %u", uint32(UNIXTIME - 1209600));			// 2 weeks
-
 	Log.Notice("World", "Starting up...");  
 	Log.Line();
 

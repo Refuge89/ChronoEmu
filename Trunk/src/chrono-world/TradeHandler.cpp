@@ -179,56 +179,36 @@ void WorldSession::HandleIgnoreTrade(WorldPacket & recv_data)
 	plr->mTradeTarget = 0;
 	_player->mTradeTarget = 0;
 }
-
+//
+// CMSG_CANCEL_TRADE
+//
 void WorldSession::HandleCancelTrade(WorldPacket & recv_data)
 {
-	CHECK_INWORLD_RETURN
-	if(_player->mTradeTarget == 0 || _player->mTradeStatus == TRADE_STATUS_COMPLETE)
-		return;
+    if(_player->mTradeTarget == 0 || _player->mTradeStatus == TRADE_STATUS_COMPLETE)
+        return;
 
-#ifdef USING_BIG_ENDIAN
-	uint32 TradeStatus = swap32(uint32(TRADE_STATUS_CANCELLED));
-#else
     uint32 TradeStatus = TRADE_STATUS_CANCELLED;
-#endif
-
     OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-
-	Player * plr = _player->GetTradeTarget();
-    if(plr)
-    {
-        if(plr->m_session && plr->m_session->GetSocket())
-		plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	
-	    plr->mTradeTarget = 0;
-		plr->ResetTradeVariables();
-    }
-	
-	_player->mTradeTarget = 0;
-	_player->ResetTradeVariables();
+    _player->GetTradeTarget()->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+    
+    _player->GetTradeTarget()->mTradeTarget = 0;
+    _player->mTradeTarget = 0;
 }
 
+//
+// Possible reference to CMSG_CANCEL_TRADE?
+//
 void WorldSession::HandleUnacceptTrade(WorldPacket & recv_data)
 {
-	CHECK_INWORLD_RETURN
-	Player * plr = _player->GetTradeTarget();
-	_player->ResetTradeVariables();
-
-	if(_player->mTradeTarget == 0 || plr == 0)
+	if (_player->mTradeTarget == 0)
 		return;
 
-#ifdef USING_BIG_ENDIAN
-	uint32 TradeStatus = swap32(uint32(TRADE_STATUS_UNACCEPTED));
-#else
 	uint32 TradeStatus = TRADE_STATUS_UNACCEPTED;
-#endif
-
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	_player->GetTradeTarget()->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 
-	plr->mTradeTarget = 0;
+	_player->GetTradeTarget()->mTradeTarget = 0;
 	_player->mTradeTarget = 0;
-	plr->ResetTradeVariables();
 }
 
 void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)

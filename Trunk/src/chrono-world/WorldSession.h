@@ -198,7 +198,7 @@ public:
 	bool HasFlag(uint32 flag) { return (_accountFlags & flag) != 0; }
 
 	// Warden System
-	void InitWarden(BigNumber *K);
+	//void InitWarden(BigNumber *K);
 
 	/* GM Permission System */
 	void LoadSecurity(std::string securitystring);
