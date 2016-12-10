@@ -275,8 +275,8 @@ bool World::SetInitialWorldSettings()
 	Log.Line();
 	Player::InitVisibleUpdateBits();
 
-	Log.Notice("World", "Loading Warden Modules...");
-	WardenDataStorage.Init();
+	//Log.Notice("World", "Loading Warden Modules...");
+	//WardenDataStorage.Init();
 
 	Log.Notice("World", "Clearing old bans, setting players offline...");
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
