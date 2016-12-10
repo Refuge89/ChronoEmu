@@ -8,8 +8,6 @@
 /*  Instance_RazorfenDowns.cpp Script									*/
 /************************************************************************/
 
-#define GAMEOBJECT_STATE 0
-
 #define AMNENNARS_WRATH 13009
 #define FROST_NOVA		15531
 #define FROSTBOLT		15530

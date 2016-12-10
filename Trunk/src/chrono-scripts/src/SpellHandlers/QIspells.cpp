@@ -247,7 +247,7 @@ bool ScrollOfMyzrael(uint32 i, Spell * pSpell)
   if(qle == nullptr)
     return true;
 
-  const float MyzraelPos[] = {-940.7374, -3111.1953, 48.9566, 3.327};
+  const float MyzraelPos[] = {-940.7374f, -3111.1953f, 48.9566f, 3.327f};
 
   Creature * myzrael = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(MyzraelPos[0], MyzraelPos[1], MyzraelPos[2], 2755);
   if(myzrael != nullptr)
