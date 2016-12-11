@@ -32,6 +32,8 @@
 
 #define _GAME
 
+template< class T, class U > T TO(U u) { return static_cast< T >(u); }
+
 #include <list>
 #include <vector>
 #include <map>
