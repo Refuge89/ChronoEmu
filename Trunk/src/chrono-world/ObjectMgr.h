@@ -489,6 +489,7 @@ public:
 	void LoadVendors();
 	void LoadTotemSpells();
 	void LoadAIThreatToSpellId();
+	void LoadSpellInFront();
 	void LoadSpellFixes();
 	void LoadSpellCoefOverride();
 	void LoadSpellForcedTargets();

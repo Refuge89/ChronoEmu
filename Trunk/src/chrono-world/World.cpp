@@ -266,8 +266,6 @@ bool BasicTaskExecutor::run()
 	return true;
 }
 
-//void Apply112SpellFixes();
-void ApplyExtraDataFixes();
 void ApplyNormalFixes();
 
 bool World::SetInitialWorldSettings()
@@ -399,7 +397,6 @@ bool World::SetInitialWorldSettings()
 
 	tl.wait();
 
-	ApplyExtraDataFixes();
 	ApplyNormalFixes();
 
 	MAKE_TASK(ObjectMgr, loadSavedVariables);		//it isn't neccessary but looks cool as task -BT
@@ -409,6 +406,7 @@ bool World::SetInitialWorldSettings()
 	MAKE_TASK(ObjectMgr, LoadSpellOverride);
 	MAKE_TASK(ObjectMgr, LoadVendors);
 	MAKE_TASK(ObjectMgr, LoadAIThreatToSpellId);
+	MAKE_TASK(ObjectMgr, LoadSpellInFront);
 	MAKE_TASK(ObjectMgr, LoadSpellFixes);
 	MAKE_TASK(ObjectMgr, LoadSpellCoefOverride);
 	MAKE_TASK(ObjectMgr, LoadSpellForcedTargets);

@@ -348,6 +348,7 @@
     <ClCompile Include="..\..\src\chrono-world\SpellEffects.cpp" />
     <ClCompile Include="..\..\src\chrono-world\SpellFixes.cpp" />
     <ClCompile Include="..\..\src\chrono-world\SpellHandler.cpp" />
+    <ClCompile Include="..\..\src\chrono-world\SpellSystem.cpp" />
     <ClCompile Include="..\..\src\chrono-world\SpellSystem\DruidSpellFixes.cpp" />
     <ClCompile Include="..\..\src\chrono-world\SpellSystem\HunterSpellFixes.cpp" />
     <ClCompile Include="..\..\src\chrono-world\SpellSystem\MageSpellFixes.cpp" />
