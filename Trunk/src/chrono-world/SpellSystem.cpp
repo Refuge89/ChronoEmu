@@ -28,7 +28,7 @@ void ObjectMgr::LoadSpellInFront()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_direction");
 	if (result)
 	{
-		sLog.outDetail("Loading %u spell_direction from database...", result->GetRowCount());
+		Log.Notice("ObjectMgr", "Loading %u spell_direction from database...", result->GetRowCount());
 		do
 		{
 			Field * f = result->Fetch();
@@ -64,6 +64,7 @@ void ObjectMgr::LoadSpellProcs()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_proc");
 	if (result)
 	{
+		Log.Notice("ObjectMgr", "Loading %u spell_proc from database...", result->GetRowCount());
 		do
 		{
 			Field * f = result->Fetch();
@@ -111,7 +112,7 @@ void ObjectMgr::LoadSpellFixes()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spellfixes");
 	if (result)
 	{
-		sLog.outDetail("Loading %u spell fixes from database...", result->GetRowCount());
+		Log.Notice("ObjectMgr", "Loading %u spellfixes from database...", result->GetRowCount());
 		do
 		{
 			Field * f = result->Fetch();
@@ -153,6 +154,7 @@ void ObjectMgr::LoadSpellForcedTargets()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_forced_targets");
 	if (result)
 	{
+		Log.Notice("ObjectMgr", "Loading %u spell_forced_targets from database...", result->GetRowCount());
 		do
 		{
 			Field * f = result->Fetch();
@@ -183,6 +185,7 @@ void ObjectMgr::LoadSpellCoefOverride()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_coef_override");
 	if (result)
 	{
+		Log.Notice("ObjectMgr", "Loading %u spell_coef_override from database...", result->GetRowCount());
 		do
 		{
 			Field * f = result->Fetch();
