@@ -12,6 +12,7 @@ CREATE TABLE `spell_information` (
   `MechanicsType` int(30) NOT NULL DEFAULT '0',
   `Attributes` int(30) NOT NULL DEFAULT '0',
   `AttributesEx` int(30) NOT NULL DEFAULT '0',
+  `TriggerSpell` int(30) NOT NULL DEFAULT '0',
   `ProcFlags` int(30) NOT NULL DEFAULT '0',
   `ProcChance` int(30) NOT NULL DEFAULT '0',
   `ProcsPerMinute` int(30) NOT NULL DEFAULT '0',
