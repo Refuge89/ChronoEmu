@@ -1,21 +1,6 @@
-/*
- * Chrono Emulator
- * Copyright (C) 2010 ChronoEmu Team <http://www.forsakengaming.com/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+//
+// CHRONO EMU (C) 2016
+//
 
 #include "StdAfx.h"
 
@@ -96,24 +81,22 @@ LootMgr::LootMgr()
 void LootMgr::LoadLoot()
 {
 	//THIS MUST BE CALLED AFTER LOADING OF ITEMS
+	DEBUG_LOG("LootMgr", "Loading loot...");
 	is_loading = true;
 	LoadLootProp();
-	printf("Loading loot...\n");
-	//LoadLootTables("creatureloot",&CreatureLoot);
-	LoadCreatureLoot();
-	LoadLootTables("objectloot",&GOLoot);
-	LoadLootTables("skinningloot",&SkinningLoot);
 	LoadLootTables("fishingloot",&FishingLoot);
-	LoadLootTables("itemloot", &ItemLoot);
-	LoadLootTables("disenchantingloot", &DisenchantingLoot);
-	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
 	is_loading = false;
 }
 
-void LootMgr::LoadCreatureLoot()
+void LootMgr::LoadDelayedLoot()
 {
 	is_loading = true;
-	LoadLootTables("creatureloot",&CreatureLoot);
+	LoadLootTables("itemloot", &ItemLoot);
+	LoadLootTables("objectloot", &GOLoot);
+	LoadLootTables("creatureloot", &CreatureLoot);
+	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
+	LoadLootTables("disenchantingloot", &DisenchantingLoot);
+	LoadLootTables("skinningloot", &SkinningLoot);
 	is_loading = false;
 }
 
@@ -197,46 +180,43 @@ LootMgr::~LootMgr()
 
 void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 {
-  /*  DBCFile *dbc = new DBCFile();
-	dbc->open("DBC/ItemRandomProperties.dbc");
-	_propCount = dbc->getRecordCount();
-	delete dbc;*/
-	//HM_NAMESPACE::hash_map<uint32, std::vector<loot_tb> > loot_db;
-	//HM_NAMESPACE::hash_map<uint32, std::vector<loot_tb> >::iterator itr;
-	printf("Attempting to load loot from table %s...\n", szTableName);
 	vector< pair< uint32, vector< tempy > > > db_cache;
-	vector< pair< uint32, vector< tempy > > >::iterator itr;
-	db_cache.reserve(10000);
-	LootStore::iterator tab;
 	QueryResult *result =WorldDatabase.Query("SELECT * FROM %s ORDER BY entryid ASC",szTableName);
 	if(!result)
 	{
 		Log.Error("LootMgr", "Loading loot from table %s failed.", szTableName);
 		return;
 	}
-	uint32 entry_id = 0;
-	uint32 last_entry = 0;
 
-	uint32 total =(uint32) result->GetRowCount();
-	int pos = 0;
+	uint32 last_entry = 0;
 	vector< tempy > ttab;
-	tempy t;
 	do 
 	{	 
-		Field *fields = result->Fetch();
-		entry_id = fields[1].GetUInt32();
+		Field* fields = result->Fetch();
+		uint32 entry_id = fields[ 1 ].GetUInt32();
 		if(entry_id < last_entry)
 		{
 			Log.Error("LootMgr", "WARNING: Out of order loot table being loaded.\n");
 			return;
 		}
-		if(entry_id != last_entry)
+		if (entry_id != last_entry)
 		{
-			if(last_entry != 0)
-				db_cache.push_back( make_pair( last_entry, ttab) );
+			if (last_entry != 0)
+			{
+				db_cache.push_back(make_pair(last_entry, ttab));
+			}
+
 			ttab.clear();
 		}
 
+		uint32 itemid = fields[ 2 ].GetUInt32();
+		if (ItemPrototypeStorage.LookupEntry(itemid) == nullptr)
+		{
+			Log.Error("LootMgr", "Loot for %u contains non-existant item %u . (%s)", entry_id, itemid, szTableName);
+			continue;
+		}
+
+		tempy t;
 		t.itemid = fields[2].GetUInt32();
 		t.chance = fields[3].GetFloat();
 		t.chance_2 = fields[4].GetFloat();
@@ -247,73 +227,62 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 		ttab.push_back( t );
 
 		last_entry = entry_id;
-	} while( result->NextRow() );
+	} 
+	while( result->NextRow() );
+	delete result;
+	
 	//last list was not pushed in
-	if(last_entry != 0 && ttab.size())
-		db_cache.push_back( make_pair( last_entry, ttab) );
-	pos = 0;
-	total = (uint32)db_cache.size();
-	ItemPrototype* proto;
-	uint32 itemid;
-
-	//for(itr=loot_db.begin();itr!=loot_db.end();++itr)
-	for( itr = db_cache.begin(); itr != db_cache.end(); ++itr)
+	if (last_entry != 0 && !ttab.empty())
 	{
-		entry_id = (*itr).first;
-		if(LootTable->end()==LootTable->find(entry_id))
+		db_cache.push_back(make_pair(last_entry, ttab));
+	}
+
+	ttab.clear();
+
+	for (auto itr : db_cache)
+	{
+		uint32 entry_id = itr.first;
+
+		if (LootTable->find(entry_id) == LootTable->end())
 		{
-			StoreLootList list;
-			//list.count = itr->second.size();			
-			list.count = (uint32)(*itr).second.size();
-			list.items=new StoreLootItem[list.count];
-		
+			StoreLootList list;		
+			list.count = static_cast< uint32 >(itr.second.size());
+			list.items = new StoreLootItem[list.count];
 			uint32 ind=0;
-			//for(std::vector<loot_tb>::iterator itr2=itr->second.begin();itr2!=itr->second.end();++itr2)
-			for(vector< tempy >::iterator itr2 = (*itr).second.begin(); itr2 != (*itr).second.end(); ++itr2)
+
+			for (auto itr2 : itr.second)
 			{
 				//Omit items that are not in db to prevent future bugs
-				//uint32 itemid=(*itr2).itemid;
-				itemid = itr2->itemid;
-				proto=ItemPrototypeStorage.LookupEntry(itemid);
-				if(!proto)
+				uint32 itemid = itr2.itemid;
+				ItemPrototype* const proto = ItemPrototypeStorage.LookupEntry(itemid);
+				if (proto == nullptr)
 				{
-					list.items[ind].item.itemproto=nullptr;
-					if(Config.MainConfig.GetBoolDefault("Server", "CleanDatabase", false))
-					{
-						WorldDatabase.Query("DELETE FROM %s where entryid ='%u' AND itemid = '%u'",szTableName, entry_id, itemid);
-					}
-					Log.Warning("LootMgr", "Loot for %u contains non-existant item. (%s)",entry_id, szTableName);
+					continue;
 				}
-				else
-				{
 					list.items[ind].item.itemproto=proto;
 					list.items[ind].item.displayid=proto->DisplayInfoID;
-					//list.items[ind].chance=(*itr2).chance;
-					list.items[ind].chance= itr2->chance;
-					list.items[ind].chance2 = itr2->chance_2;
-					list.items[ind].mincount = itr2->mincount;
-					list.items[ind].maxcount = itr2->maxcount;
-					list.items[ind].ffa_loot = itr2->ffa_loot;
+					list.items[ind].chance= itr2.chance;
+					list.items[ind].chance2 = itr2.chance_2;
+					list.items[ind].mincount = itr2.mincount;
+					list.items[ind].maxcount = itr2.maxcount;
+					list.items[ind].ffa_loot = itr2.ffa_loot;
 
 					if(LootTable == &GOLoot)
 					{
 						if(proto->Class == ITEM_CLASS_QUEST)
 						{
-							//printf("Quest item \"%s\" allocated to quest ", proto->Name1.c_str());
-							sQuestMgr.SetGameObjectLootQuest(itr->first, itemid);
+							sQuestMgr.SetGameObjectLootQuest(itr.first, itemid);
 							quest_loot_go[entry_id].insert(proto->ItemId);
 						}
 					}
-				}
-				ind++;
+				++ind;
 			}
-			(*LootTable)[entry_id]=list;
+			(*LootTable)[entry_id] = list;
 		}
 	}
 
-	printf("%d loot templates loaded from %s\n", db_cache.size(), szTableName);
- //   loot_db.clear();
-	delete result;
+	Log.Success("LootMgr", "Loaded %u loot templates from %s", db_cache.size(), szTableName);
+	db_cache.clear();
 }
 
 void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic, bool disenchant)
@@ -422,14 +391,20 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic, bool disenc
 
 }
 
-void LootMgr::FillCreatureLoot(Loot * loot,uint32 loot_id, bool heroic)
+void LootMgr::FillCreatureLoot(Loot * loot, uint32 loot_id, bool heroic)
 {
 	loot->items.clear();
-	loot->gold =0;
-	
-	LootStore::iterator tab =CreatureLoot.find(loot_id);
-	if( CreatureLoot.end()==tab)return;
-	else PushLoot(&tab->second,loot, heroic, false);
+	loot->gold = 0;
+
+	LootStore::iterator tab = CreatureLoot.find(loot_id);
+	if (CreatureLoot.end() == tab)
+	{
+		return;
+	}
+	else
+	{
+		PushLoot(&tab->second, loot, heroic, false);
+	}
 }
 
 void LootMgr::FillGOLoot(Loot * loot,uint32 loot_id, bool heroic)
