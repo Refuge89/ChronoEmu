@@ -57,13 +57,16 @@ bool CThreadPool::ThreadExit(Thread * t)
 	m_activeThreads.erase(t);
 
 	// do we have to kill off some threads?
-	if(_threadsToExit > 0)
+	if (_threadsToExit > 0)
 	{
 		// kill us.
 		--_threadsToExit;
 		++_threadsExitedSinceLastCheck;
-		if(t->DeleteAfterExit)
+
+		if (t->DeleteAfterExit)
+		{
 			m_freeThreads.erase(t);
+		}
 
 		_mutex.Release();
 		delete t;
@@ -81,7 +84,6 @@ bool CThreadPool::ThreadExit(Thread * t)
 	}
 	m_freeThreads.insert(t);
 	
-	//Log.Debug("ThreadPool", "Thread %u entered the free pool.", t->ControlInterface.GetId());
 	_mutex.Release();
 	return true;
 }
@@ -277,8 +279,10 @@ static unsigned long WINAPI thread_proc(void* param)
 	{
 		if(t->ExecutionTarget != nullptr)
 		{
-			if( RunThread( t->ExecutionTarget ) )
+			if (t->ExecutionTarget->run())
+			{
 				delete t->ExecutionTarget;
+			}
 
 			t->ExecutionTarget = nullptr;
 		}
@@ -290,8 +294,10 @@ static unsigned long WINAPI thread_proc(void* param)
 		}
 		else
 		{
-			if(ht)
+			if (ht)
+			{
 				Log.Debug("ThreadPool", "Thread %u waiting for a new task.", tid);
+			}
 			// enter "suspended" state. when we return, the threadpool will either tell us to fuk off, or to execute a new task.
 			t->ControlInterface.Suspend();
 			// after resuming, this is where we will end up. start the loop again, check for tasks, then go back to the threadpool.
@@ -299,10 +305,7 @@ static unsigned long WINAPI thread_proc(void* param)
 	}
 
 	// at this point the t pointer has already been freed, so we can just cleanly exit.
-	//ExitThread(0);
-
-	// not reached
-	return 0;
+	ExitThread(0);
 }
 
 Thread * CThreadPool::StartThread(ThreadContext * ExecutionTarget)
