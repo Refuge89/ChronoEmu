@@ -28,9 +28,7 @@ CREATE TABLE `spell_information` (
   `NameHash` int(30) NOT NULL DEFAULT '0',
   `CanCrit` BOOL NOT NULL DEFAULT '0',
   `IsRanged` BOOL NOT NULL DEFAULT '0',
-  `IsMelee` BOOL NOT NULL DEFAULT '0',
-  `BaseRangeRad` int(30) NOT NULL DEFAULT '0',
-  `BaseRangeRadS` int(30) NOT NULL DEFAULT '0',										
+  `IsMelee` BOOL NOT NULL DEFAULT '0',									
   PRIMARY KEY (`Entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
