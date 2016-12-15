@@ -4187,17 +4187,20 @@ void Player::UpdateChances()
 	float tmp = 0;
 	float defence_contribution = 0;
 
-	// defence contribution estimate
-	defence_contribution = ( float( _GetSkillLineCurrent( SKILL_DEFENSE, true ) ) - ( float( pLevel ) * 5.0f ) ) * 0.04f;
-	defence_contribution += CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) * 0.04f;
+	defence_contribution = _GetSkillLineCurrent(SKILL_DEFENSE, true) - (pLevel * 5.0f);
+	defence_contribution += CalcRating(PLAYER_RATING_MODIFIER_DEFENCE);
+	defence_contribution = floorf(defence_contribution) * 0.04f;   // defense skill is treated as an integer on retail
 
-	// dodge
-	tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pLevel-1][pClass] );
-	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE ) + this->GetDodgeFromSpell();
+	// dodge 2.0
+	tmp = baseDodge[pClass];
+	tmp += float(GetUInt32Value(UNIT_FIELD_STAT1 * agilitytoDodge[pClass])); // Dodge from agility
+	tmp += GetDodgeFromSpell();
 	tmp += defence_contribution;
-	if( tmp < 0.0f )tmp = 0.0f;
 
-	SetFloatValue( PLAYER_DODGE_PERCENTAGE, min( tmp, 95.0f ) );
+	if (tmp < 0.0f)
+		tmp = 0.0f;
+
+	SetFloatValue(PLAYER_DODGE_PERCENTAGE, max(0.0f, min(tmp, 100.0f)));
 
 	// block
 	Item* it = this->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
