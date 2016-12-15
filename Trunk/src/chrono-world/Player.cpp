@@ -5922,10 +5922,7 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 
 	uint32 traveltime = uint32(traveldist * TAXI_TRAVEL_SPEED);
 
-	if( start_node > endn || (endn - start_node) > 200 )
-		return;
-
-	WorldPacket data(SMSG_MONSTER_MOVE, 38 + ( (endn - start_node) * 12 ) );
+	WorldPacket data(SMSG_MONSTER_MOVE, 38 + ((path->GetNodeCount() - start_node) * 12));
 	data << GetNewGUID();
 	data << firstNode->x << firstNode->y << firstNode->z;
 	data << m_taxi_ride_time;
